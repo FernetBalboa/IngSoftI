@@ -56,6 +56,14 @@ class IdionTest(unittest.TestCase):
         
         self.assertTrue((timeAfterRunning - timeBeforeRunning) * 1000 < timeInMilliseconds)
 
+
+	def tryInvalidCustomerBookMethodAndAssertException(self, customerBook, method, methodArgs, exceptionType):
+		try:
+			method(customerBook, methodArgs)
+			self.fail()
+		except KeyError as exception:
+			self.assertEquals(exception.message, exceptionType)
+
     def testAddingCustomerShouldNotTakeMoreThan50Milliseconds(self):
         customerBook = CustomerBook()
         self.assertCustomerBookMethodTime(customerBook, CustomerBook.addCustomerNamed, 'John Lennon', 50)
@@ -69,25 +77,26 @@ class IdionTest(unittest.TestCase):
 
     def testCanNotAddACustomerWithEmptyName(self):
         customerBook = CustomerBook()
-        
-        try:
-            customerBook.addCustomerNamed('')
-            self.fail()
-        except ValueError as exception:
-            self.assertEquals(exception.message,CustomerBook.CUSTOMER_NAME_CAN_NOT_BE_EMPTY)
-            self.assertTrue(customerBook.isEmpty())
+        self.tryInvalidCustomerBookMethodAndAssertException(customerBook, CustomerBook.addCustomerNamed, '', CustomerBook.CUSTOMER_NAME_CAN_NOT_BE_EMPTY)
+        # try:
+        #     customerBook.addCustomerNamed('')
+        #     self.fail()
+        # except ValueError as exception:
+        #     self.assertEquals(exception.message,CustomerBook.CUSTOMER_NAME_CAN_NOT_BE_EMPTY)
+        self.assertTrue(customerBook.isEmpty())
                  
     def testCanNotRemoveNotAddedCustomer(self):
         customerBook = CustomerBook()
         customerBook.addCustomerNamed('Paul McCartney')
+        self.tryInvalidCustomerBookMethodAndAssertException(customerBook, CustomerBook.removeCustomerNamed, 'John Lennon', CustomerBook.INVALID_CUSTOMER_NAME)
         
-        try:
-            customerBook.removeCustomerNamed('John Lennon')
-            self.fail()
-        except KeyError as exception:
-            self.assertEquals(exception.message,CustomerBook.INVALID_CUSTOMER_NAME)
-            self.assertTrue(customerBook.numberOfCustomers()==1)
-            self.assertTrue(customerBook.includesCustomerNamed('Paul McCartney'))
+        # try:
+        #     customerBook.removeCustomerNamed('John Lennon')
+        #     self.fail()
+        # except KeyError as exception:
+        #     self.assertEquals(exception.message,CustomerBook.INVALID_CUSTOMER_NAME)
+        self.assertTrue(customerBook.numberOfCustomers()==1)
+        self.assertTrue(customerBook.includesCustomerNamed('Paul McCartney'))
 
       
 if __name__ == "__main__":

@@ -32,21 +32,20 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	customerBook addCustomerNamed: paulMcCartney.
 	self assertCustomerBookMethod: [ customerBook removeCustomerNamed: paulMcCartney ] runsInLessTimeThan: 100! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'HernanWilkinson 5/9/2012 18:12'!
-test03CanNotAddACustomerWithEmptyName 
+!IdiomTest methodsFor: 'testing' stamp: 'PLV 9/6/2017 16:23:19'!
+test03CanNotAddACustomerWithEmptyName
 
 	| customerBook |
 			
 	customerBook := CustomerBook new.
-
-	[ customerBook addCustomerNamed: ''.
-	self fail ]
-		on: Error 
-		do: [ :anError | 
+		
+	self assertCustomerBookMethod: [ customerBook addCustomerNamed: ''. ] withException: Error checking: 
+		[ :anError | 
 			self assert: anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage.
-			self assert: customerBook isEmpty ]! !
+			self assert: customerBook isEmpty ]
+		! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'HAW 8/28/2017 08:57:25'!
+!IdiomTest methodsFor: 'testing' stamp: 'PLV 9/6/2017 16:23:11'!
 test04CanNotRemoveAnInvalidCustomer
 	
 	| customerBook johnLennon |
@@ -55,12 +54,11 @@ test04CanNotRemoveAnInvalidCustomer
 	johnLennon := 'John Lennon'.
 	customerBook addCustomerNamed: johnLennon.
 	
-	[ customerBook removeCustomerNamed: 'Paul McCartney'.
-	self fail ]
-		on: NotFound 
-		do: [ :anError | 
+	self assertCustomerBookMethod: [ customerBook removeCustomerNamed: 'Paul McCartney'. ] withException: NotFound checking: 
+		[ :anError | 
 			self assert: customerBook numberOfCustomers = 1.
 			self assert: (customerBook includesCustomerNamed: johnLennon) ]
+
 ! !
 
 
@@ -76,6 +74,13 @@ assertCustomerBookMethod: aCustomerBookMethodClosure runsInLessTimeThan: aTimeQu
 	self assert: (millisecondsAfterRunning-millisecondsBeforeRunning) < aTimeQuantityInMilliseconds 
 	
 ! !
+
+!IdiomTest methodsFor: 'Testing Auxiliars' stamp: 'PLV 9/6/2017 16:22:52'!
+assertCustomerBookMethod: aCustomerBookMethodClosure withException: anExceptionType checking: aVerifingClosure
+
+	[ aCustomerBookMethodClosure value self fail ]
+		on: anExceptionType 
+		do: aVerifingClosure! !
 
 
 !classDefinition: #CustomerBook category: #'CodigoRepetido-Ejercicio'!

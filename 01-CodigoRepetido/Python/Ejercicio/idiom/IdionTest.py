@@ -49,41 +49,50 @@ class CustomerBook:
 
 class IdionTest(unittest.TestCase):
     
-    def assertCustomerBookMethodTime(self, customerBook, method, methodArgsTuple, timeInMilliseconds):
+    def assertMethodClosureTime(self, methodClosure, timeInMilliseconds):
         timeBeforeRunning = time.time()
-        method(customerBook, *methodArgsTuple)
+        methodClosure()
         timeAfterRunning = time.time()
-        
         self.assertTrue((timeAfterRunning - timeBeforeRunning) * 1000 < timeInMilliseconds)
 
 
-    def tryInvalidCustomerBookMethodAndAssertException(self, customerBook, method, methodArgsTuple, exceptionType, exceptionError):
+    def createMethodClosure(self, object, method, methodArguments):
+        def executeMethod():
+		    method(object, methodArguments)
+        return executeMethod
+    
+    def tryInvalidMethodClosureAndAssertException(self, methodClosure, exceptionType, exceptionError):
         try:
-            method(customerBook, *methodArgsTuple)
+            methodClosure()
             self.fail()
         except exceptionType as exception:
             self.assertEquals(exception.message, exceptionError)
 
-    def testAddingCustomerShouldNotTakeMoreThan50Milliseconds(self):
-        customerBook = CustomerBook()
-        self.assertCustomerBookMethodTime(customerBook, CustomerBook.addCustomerNamed, ('John Lennon',), 50)
+    def testAddingCustomerShouldNotTakeMOreThan50Milliseconds(self):
+		customerBook = CustomerBook()
+		addCustomerMethodClosure = self.createMethodClosure(customerBook, CustomerBook.addCustomerNamed, 'John Lennon')
+		self.assertMethodClosureTime(addCustomerMethodClosure, 50)
+
 
     def testRemovingCustomerShouldNotTakeMoreThan100Milliseconds(self):
         customerBook = CustomerBook()
         paulMcCartney = 'Paul McCartney'
         customerBook.addCustomerNamed(paulMcCartney)
-        self.assertCustomerBookMethodTime(customerBook, CustomerBook.removeCustomerNamed, (paulMcCartney,), 100)
+        removeCustomerMethodClosure = self.createMethodClosure(customerBook, CustomerBook.removeCustomerNamed, paulMcCartney)
+        self.assertMethodClosureTime(removeCustomerMethodClosure, 100)
       
 
     def testCanNotAddACustomerWithEmptyName(self):
         customerBook = CustomerBook()
-        self.tryInvalidCustomerBookMethodAndAssertException(customerBook, CustomerBook.addCustomerNamed, ('',), ValueError, CustomerBook.CUSTOMER_NAME_CAN_NOT_BE_EMPTY)
+        addInvalidCustomerMethodClosure = self.createMethodClosure(customerBook, CustomerBook.addCustomerNamed, '')
+        self.tryInvalidMethodClosureAndAssertException(addInvalidCustomerMethodClosure, ValueError, CustomerBook.CUSTOMER_NAME_CAN_NOT_BE_EMPTY)
         self.assertTrue(customerBook.isEmpty())
                  
     def testCanNotRemoveNotAddedCustomer(self):
         customerBook = CustomerBook()
         customerBook.addCustomerNamed('Paul McCartney')
-        self.tryInvalidCustomerBookMethodAndAssertException(customerBook, CustomerBook.removeCustomerNamed, ('John Lennon',), KeyError, CustomerBook.INVALID_CUSTOMER_NAME)
+        removeInvalidCustomerMethodClosure = self.createMethodClosure(customerBook, CustomerBook.removeCustomerNamed, 'John Lennon')
+        self.tryInvalidMethodClosureAndAssertException(removeInvalidCustomerMethodClosure, KeyError, CustomerBook.INVALID_CUSTOMER_NAME)
         self.assertTrue(customerBook.numberOfCustomers()==1)
         self.assertTrue(customerBook.includesCustomerNamed('Paul McCartney'))
 

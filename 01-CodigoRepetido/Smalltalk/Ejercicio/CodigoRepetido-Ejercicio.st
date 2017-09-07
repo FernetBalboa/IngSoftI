@@ -13,15 +13,15 @@ TestCase subclass: #IdiomTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
-!IdiomTest methodsFor: 'testing' stamp: 'p 9/3/2017 17:23:31'!
+!IdiomTest methodsFor: 'testing' stamp: 'FB 9/7/2017 13:36:05'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 
 	| customerBook |
 	
 	customerBook := CustomerBook  new.
-	self assertCustomerBookMethod: [ customerBook addCustomerNamed: 'John Lennon' ] runsInLessTimeThan: 50.! !
+	self assertClosure: [ customerBook addCustomerNamed: 'John Lennon' ] runsInLessTimeThan: 50.! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'p 9/3/2017 17:25:25'!
+!IdiomTest methodsFor: 'testing' stamp: 'FB 9/7/2017 13:36:15'!
 test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 
 	| customerBook paulMcCartney |
@@ -30,22 +30,22 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	paulMcCartney := 'Paul McCartney'.
 	
 	customerBook addCustomerNamed: paulMcCartney.
-	self assertCustomerBookMethod: [ customerBook removeCustomerNamed: paulMcCartney ] runsInLessTimeThan: 100! !
+	self assertClosure: [ customerBook removeCustomerNamed: paulMcCartney ] runsInLessTimeThan: 100! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'PLV 9/6/2017 16:23:19'!
+!IdiomTest methodsFor: 'testing' stamp: 'FB 9/7/2017 13:49:33'!
 test03CanNotAddACustomerWithEmptyName
 
 	| customerBook |
 			
 	customerBook := CustomerBook new.
 		
-	self assertCustomerBookMethod: [ customerBook addCustomerNamed: ''. ] withException: Error checking: 
+	self assertClosure: [ customerBook addCustomerNamed: ''. ] throwsExceptionOfType: Error andCheckThat: 
 		[ :anError | 
 			self assert: anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage.
 			self assert: customerBook isEmpty ]
 		! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'PLV 9/6/2017 16:23:11'!
+!IdiomTest methodsFor: 'testing' stamp: 'FB 9/7/2017 13:49:15'!
 test04CanNotRemoveAnInvalidCustomer
 	
 	| customerBook johnLennon |
@@ -54,7 +54,7 @@ test04CanNotRemoveAnInvalidCustomer
 	johnLennon := 'John Lennon'.
 	customerBook addCustomerNamed: johnLennon.
 	
-	self assertCustomerBookMethod: [ customerBook removeCustomerNamed: 'Paul McCartney'. ] withException: NotFound checking: 
+	self assertClosure: [ customerBook removeCustomerNamed: 'Paul McCartney'. ] throwsExceptionOfType: NotFound andCheckThat: 
 		[ :anError | 
 			self assert: customerBook numberOfCustomers = 1.
 			self assert: (customerBook includesCustomerNamed: johnLennon) ]
@@ -62,25 +62,25 @@ test04CanNotRemoveAnInvalidCustomer
 ! !
 
 
-!IdiomTest methodsFor: 'Testing Auxiliars' stamp: 'p 9/3/2017 17:20:40'!
-assertCustomerBookMethod: aCustomerBookMethodClosure runsInLessTimeThan: aTimeQuantityInMilliseconds
+!IdiomTest methodsFor: 'Testing Auxiliars' stamp: 'FB 9/7/2017 13:35:47'!
+assertClosure: aClosure runsInLessTimeThan: aTimeQuantityInMilliseconds
 
 	| millisecondsBeforeRunning millisecondsAfterRunning |
 	
 	millisecondsBeforeRunning := Time millisecondClockValue.
-	aCustomerBookMethodClosure value.
+	aClosure value.
 	millisecondsAfterRunning := Time millisecondClockValue.
 	
 	self assert: (millisecondsAfterRunning-millisecondsBeforeRunning) < aTimeQuantityInMilliseconds 
 	
 ! !
 
-!IdiomTest methodsFor: 'Testing Auxiliars' stamp: 'PLV 9/6/2017 16:22:52'!
-assertCustomerBookMethod: aCustomerBookMethodClosure withException: anExceptionType checking: aVerifingClosure
+!IdiomTest methodsFor: 'Testing Auxiliars' stamp: 'FB 9/7/2017 13:48:22'!
+assertClosure: anInvalidClosure throwsExceptionOfType: anExceptionType andCheckThat: aVerifyingClosure
 
-	[ aCustomerBookMethodClosure value self fail ]
+	[ anInvalidClosure value self fail ]
 		on: anExceptionType 
-		do: aVerifingClosure! !
+		do: aVerifyingClosure! !
 
 
 !classDefinition: #CustomerBook category: #'CodigoRepetido-Ejercicio'!

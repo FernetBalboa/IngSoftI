@@ -139,10 +139,29 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
-	instanceVariableNames: ''
+	instanceVariableNames: 'topNode bottomNode'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:45:30'!
+isEmpty
+
+	^topNode value = nil ! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:51:47'!
+pop
+	
+	| topElement |
+	topElement := topNode value.
+	topNode := topNode nextNode.
+	^topElement ! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:43:43'!
+push: aObject
+
+	topNode := Node withNext: nil andValue: aObject.
+	bottomNode := topNode ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -154,3 +173,53 @@ OOStack class
 stackEmptyErrorDescription
 	
 	^ 'Stack is empty'! !
+
+
+!classDefinition: #Node category: #'Stack-Exercise'!
+OOStack subclass: #Node
+	instanceVariableNames: 'nextNode value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!Node methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 19:32:46'!
+nextNode
+
+	^nextNode ! !
+
+!Node methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 19:34:32'!
+nextNode: aNode
+
+	nextNode := aNode ! !
+
+!Node methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:28:02'!
+nextNode: aNode andValue: aValue
+
+	self nextNode: aNode.
+	self  value: aValue.! !
+
+!Node methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:00:05'!
+value
+
+	^value! !
+
+!Node methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:01:54'!
+value: aObject
+
+	value := aObject ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Node class' category: #'Stack-Exercise'!
+Node class
+	instanceVariableNames: ''!
+
+!Node class methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:28:46'!
+withNext: alink
+
+	^ self new nextNode: alink! !
+
+!Node class methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:28:26'!
+withNext: alink andValue: aValue
+
+	^ self new nextNode: alink andValue: aValue ! !

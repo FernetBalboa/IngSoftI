@@ -76,7 +76,7 @@ test06TopReturnsLastPushedObject
 	self assert: stack top = pushedObject.
 	! !
 
-!OOStackTest methodsFor: 'test' stamp: 'HernanWilkinson 5/7/2012 11:36'!
+!OOStackTest methodsFor: 'test' stamp: 'CM 9/12/2017 21:23:38'!
 test07TopDoesNotRemoveObjectFromStack
 
 	| stack pushedObject |
@@ -139,29 +139,41 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
-	instanceVariableNames: 'topNode bottomNode'
+	instanceVariableNames: 'topNode size'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:45:30'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 21:17:49'!
 isEmpty
 
-	^topNode value = nil ! !
+	^self size = 0 ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:51:47'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 21:19:34'!
 pop
 	
 	| topElement |
 	topElement := topNode value.
 	topNode := topNode nextNode.
+	size := size - 1.
 	^topElement ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:43:43'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 21:20:51'!
 push: aObject
+	size isNil ifTrue: [ size := 1 ] ifFalse: [size := size +1].
+	topNode := Node withNext: topNode andValue: aObject.
+! !
 
-	topNode := Node withNext: nil andValue: aObject.
-	bottomNode := topNode ! !
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 21:22:36'!
+size
+	size isNil ifTrue: [^0] ifFalse:[^size] 
+! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 21:05:53'!
+top
+	
+	^topNode value
+! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 

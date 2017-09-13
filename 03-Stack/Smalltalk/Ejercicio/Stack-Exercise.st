@@ -149,13 +149,15 @@ isEmpty
 
 	^self size = 0 ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 21:19:34'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 05:59:36'!
 pop
 	
 	| topElement |
+	self size = 0 ifTrue: [self signalStackEmptyErrorDescription ].
 	topElement := topNode value.
 	topNode := topNode nextNode.
 	size := size - 1.
+	
 	^topElement ! !
 
 !OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 21:20:51'!
@@ -164,14 +166,19 @@ push: aObject
 	topNode := Node withNext: topNode andValue: aObject.
 ! !
 
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 05:57:44'!
+signalStackEmptyErrorDescription 
+
+	self error: self class stackEmptyErrorDescription! !
+
 !OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 21:22:36'!
 size
 	size isNil ifTrue: [^0] ifFalse:[^size] 
 ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 21:05:53'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 06:00:19'!
 top
-	
+	self size = 0 ifTrue: [self signalStackEmptyErrorDescription ].	
 	^topNode value
 ! !
 

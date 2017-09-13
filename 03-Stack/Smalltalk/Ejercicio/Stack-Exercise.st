@@ -149,36 +149,41 @@ isEmpty
 
 	^self size = 0 ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 05:59:36'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 07:10:34'!
 pop
-	
+
 	| topElement |
-	self size = 0 ifTrue: [self signalStackEmptyErrorDescription ].
-	topElement := topNode value.
-	topNode := topNode nextNode.
-	size := size - 1.
+	self isEmpty 
+		ifTrue: [self signalStackEmptyErrorDescription ].
+	topElement _ topNode value.
+	topNode _ topNode nextNode.
+	size _ size - 1.
 	
 	^topElement ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 21:20:51'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 07:09:44'!
 push: aObject
-	size isNil ifTrue: [ size := 1 ] ifFalse: [size := size +1].
-	topNode := Node withNext: topNode andValue: aObject.
-! !
+	self isEmpty 
+		ifTrue: [ size _ 1 ]
+		ifFalse: [ size _ size + 1 ].
+	topNode _ OONode withNext: topNode andValue: aObject.! !
 
 !OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 05:57:44'!
 signalStackEmptyErrorDescription 
 
 	self error: self class stackEmptyErrorDescription! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 21:22:36'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 06:59:04'!
 size
-	size isNil ifTrue: [^0] ifFalse:[^size] 
+	size isNil 
+		ifTrue: [^0] 
+		ifFalse:[^size] 
 ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 06:00:19'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 07:10:15'!
 top
-	self size = 0 ifTrue: [self signalStackEmptyErrorDescription ].	
+	self isEmpty 
+		ifTrue: [self signalStackEmptyErrorDescription ].	
 	^topNode value
 ! !
 
@@ -194,51 +199,51 @@ stackEmptyErrorDescription
 	^ 'Stack is empty'! !
 
 
-!classDefinition: #Node category: #'Stack-Exercise'!
-OOStack subclass: #Node
+!classDefinition: #OONode category: #'Stack-Exercise'!
+OOStack subclass: #OONode
 	instanceVariableNames: 'nextNode value'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!Node methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 19:32:46'!
+!OONode methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 19:32:46'!
 nextNode
 
 	^nextNode ! !
 
-!Node methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 19:34:32'!
+!OONode methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 07:02:47'!
 nextNode: aNode
 
-	nextNode := aNode ! !
+	nextNode _ aNode ! !
 
-!Node methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:28:02'!
+!OONode methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 06:15:23'!
 nextNode: aNode andValue: aValue
 
 	self nextNode: aNode.
-	self  value: aValue.! !
+	self value: aValue.! !
 
-!Node methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:00:05'!
+!OONode methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:00:05'!
 value
 
 	^value! !
 
-!Node methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:01:54'!
+!OONode methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 07:03:08'!
 value: aObject
 
-	value := aObject ! !
+	value _ aObject ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Node class' category: #'Stack-Exercise'!
-Node class
+!classDefinition: 'OONode class' category: #'Stack-Exercise'!
+OONode class
 	instanceVariableNames: ''!
 
-!Node class methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:28:46'!
+!OONode class methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:28:46'!
 withNext: alink
 
 	^ self new nextNode: alink! !
 
-!Node class methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:28:26'!
+!OONode class methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:28:26'!
 withNext: alink andValue: aValue
 
 	^ self new nextNode: alink andValue: aValue ! !

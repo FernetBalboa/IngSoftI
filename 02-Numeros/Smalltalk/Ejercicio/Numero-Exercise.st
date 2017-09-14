@@ -316,20 +316,15 @@ initalizeWith: aValue
 	
 	^self class with: value // aDivisor integerValue! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'FB 9/11/2017 15:16:09'!
-dividirEntero: unEntero
+!Entero methodsFor: 'arithmetic operations' stamp: 'FB 9/14/2017 10:05:50'!
+dividirEntero: unDividendoEntero
 
-	^Fraccion with: unEntero over: self.! !
+	^Fraccion with: unDividendoEntero over: self.! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'FB 9/11/2017 15:16:47'!
-dividirFraccion: unaFraccion
+!Entero methodsFor: 'arithmetic operations' stamp: 'FB 9/14/2017 10:05:12'!
+dividirFraccion: unDividendoFraccionario
 
-	^Fraccion with: unaFraccion numerator over: self * unaFraccion denominator.! !
-
-!Entero methodsFor: 'arithmetic operations' stamp: 'FB 9/11/2017 15:12:06'!
-dividirPorFraccion: unaFraccion
-
-	^Fraccion with: self * unaFraccion denominator over: unaFraccion numerator.! !
+	^Fraccion with: unDividendoFraccionario numerator over: self * unDividendoFraccionario denominator.! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:00'!
 greatestCommonDivisorWith: anEntero 
@@ -451,15 +446,15 @@ hash
 	
 	^aDivisor dividirFraccion: self.! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'FB 9/11/2017 15:22:06'!
-dividirEntero: unEntero
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FB 9/14/2017 12:15:13'!
+dividirEntero: unDividendoEntero
 
-	^Fraccion with: unEntero * denominator over: numerator.! !
+	^Fraccion with: unDividendoEntero * denominator over: numerator.! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'FB 9/11/2017 15:25:15'!
-dividirFraccion: unaFraccion
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FB 9/14/2017 12:15:38'!
+dividirFraccion: unaDividendoFraccionario
 
-	^Fraccion with: unaFraccion numerator * denominator over: unaFraccion denominator * numerator.! !
+	^Fraccion with: unaDividendoFraccionario numerator * denominator over: unaDividendoFraccionario denominator * numerator.! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'FB 9/11/2017 14:58:19'!
 multiplicarPorEntero: unEntero
@@ -504,7 +499,7 @@ numerator
 Fraccion class
 	instanceVariableNames: ''!
 
-!Fraccion class methodsFor: 'intance creation' stamp: 'HernanWilkinson 5/7/2016 20:41'!
+!Fraccion class methodsFor: 'instance creation' stamp: 'FB 9/14/2017 10:20:50'!
 with: aDividend over: aDivisor
 
 	| greatestCommonDivisor numerator denominator |

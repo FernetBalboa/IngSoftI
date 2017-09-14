@@ -144,46 +144,52 @@ Object subclass: #OOStack
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 19:27:56'!
+ifEmptySendErrorSignal
+	
+	self isEmpty 
+		ifTrue: [self signalStackEmptyErrorDescription].! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 19:08:20'!
+intializeStack
+	
+	size _ 0! !
+
 !OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 21:17:49'!
 isEmpty
 
 	^self size = 0 ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 07:10:34'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 19:15:13'!
 pop
 
 	| topElement |
-	self isEmpty 
-		ifTrue: [self signalStackEmptyErrorDescription ].
+	self ifEmptySendErrorSignal.
 	topElement _ topNode value.
 	topNode _ topNode nextNode.
 	size _ size - 1.
 	
 	^topElement ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 07:09:44'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 19:10:21'!
 push: aObject
-	self isEmpty 
-		ifTrue: [ size _ 1 ]
-		ifFalse: [ size _ size + 1 ].
-	topNode _ OONode withNext: topNode andValue: aObject.! !
+	topNode _ OONode withNext: topNode andValue: aObject.
+	size _ size+1! !
 
 !OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 05:57:44'!
 signalStackEmptyErrorDescription 
 
 	self error: self class stackEmptyErrorDescription! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 06:59:04'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 19:08:38'!
 size
-	size isNil 
-		ifTrue: [^0] 
-		ifFalse:[^size] 
+	
+	^size
 ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 07:10:15'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 19:14:58'!
 top
-	self isEmpty 
-		ifTrue: [self signalStackEmptyErrorDescription ].	
+	self ifEmptySendErrorSignal.
 	^topNode value
 ! !
 
@@ -192,6 +198,14 @@ top
 !classDefinition: 'OOStack class' category: #'Stack-Exercise'!
 OOStack class
 	instanceVariableNames: ''!
+
+!OOStack class methodsFor: 'error descriptions' stamp: 'CM 9/13/2017 19:07:25'!
+new
+
+	| objectTemporal |
+	objectTemporal _ super new.
+	objectTemporal intializeStack.
+	^objectTemporal ! !
 
 !OOStack class methodsFor: 'error descriptions' stamp: 'HernanWilkinson 5/7/2012 11:51'!
 stackEmptyErrorDescription

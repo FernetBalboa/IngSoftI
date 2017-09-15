@@ -153,11 +153,11 @@ isEmpty
 
 	^self size = 0 ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/14/2017 06:50:58'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/15/2017 01:10:19'!
 pop
 
 	| stackTop |
-	self top.
+	self topOrError.
 	stackTop _ topElement value.
 	topElement _ topElement nextElement.
 	size _ size - 1.
@@ -177,10 +177,16 @@ size
 	^size
 ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/14/2017 06:50:22'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/15/2017 01:10:35'!
 top
-	"self ifEmptySendErrorSignal."
+
 	^topElement value
+! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/15/2017 01:10:10'!
+topOrError
+
+	self top.
 ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -188,6 +194,10 @@ top
 !classDefinition: 'OOStack class' category: #'Stack-Exercise'!
 OOStack class
 	instanceVariableNames: ''!
+
+!OOStack class methodsFor: 'error descriptions' stamp: 'CM 9/15/2017 00:55:59'!
+errorSignalEmptyStack
+	self error: self stackEmptyErrorDescription.! !
 
 !OOStack class methodsFor: 'error descriptions' stamp: 'CM 9/14/2017 21:28:13'!
 new
@@ -233,10 +243,10 @@ nextElement
 
 	^nil! !
 
-!OOStackBaseElement methodsFor: 'as yet unclassified' stamp: 'CM 9/14/2017 21:39:36'!
+!OOStackBaseElement methodsFor: 'as yet unclassified' stamp: 'CM 9/15/2017 00:57:23'!
 value
 
-	^OOStack stackEmptyErrorDescription ! !
+	OOStack errorSignalEmptyStack.! !
 
 
 !classDefinition: #OOStackedElement category: #'Stack-Exercise'!

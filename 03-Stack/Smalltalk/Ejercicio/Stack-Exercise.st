@@ -5,11 +5,10 @@ TestCase subclass: #OOStackTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStackTest methodsFor: 'test' stamp: 'HernanWilkinson 5/7/2012 11:30'!
+!OOStackTest methodsFor: 'test' stamp: 'CM 9/14/2017 21:29:32'!
 test01StackShouldBeEmptyWhenCreated
 
 	| stack |
-	
 	stack := OOStack new.
 	
 	self assert: stack isEmpty! !
@@ -139,47 +138,38 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
-	instanceVariableNames: 'topNode size'
+	instanceVariableNames: 'topElement size'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 19:27:56'!
-ifEmptySendErrorSignal
-	
-	self isEmpty 
-		ifTrue: [self signalStackEmptyErrorDescription].! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 19:08:20'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/14/2017 21:28:51'!
 intializeStack
-	
-	size _ 0! !
+	size _ 0.
+	topElement _ OOStackBaseElement basicNew.! !
 
 !OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 21:17:49'!
 isEmpty
 
 	^self size = 0 ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 19:15:13'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/14/2017 06:50:58'!
 pop
 
-	| topElement |
-	self ifEmptySendErrorSignal.
-	topElement _ topNode value.
-	topNode _ topNode nextNode.
+	| stackTop |
+	self top.
+	stackTop _ topElement value.
+	topElement _ topElement nextElement.
 	size _ size - 1.
 	
-	^topElement ! !
+	^stackTop ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 19:10:21'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/14/2017 06:37:32'!
 push: aObject
-	topNode _ OONode withNext: topNode andValue: aObject.
-	size _ size+1! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 05:57:44'!
-signalStackEmptyErrorDescription 
-
-	self error: self class stackEmptyErrorDescription! !
+	topElement _ OOStackedElement
+		withNext: topElement 
+		andValue: aObject.
+	size _ size + 1.! !
 
 !OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 19:08:38'!
 size
@@ -187,10 +177,10 @@ size
 	^size
 ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 19:14:58'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'CM 9/14/2017 06:50:22'!
 top
-	self ifEmptySendErrorSignal.
-	^topNode value
+	"self ifEmptySendErrorSignal."
+	^topElement value
 ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -199,11 +189,11 @@ top
 OOStack class
 	instanceVariableNames: ''!
 
-!OOStack class methodsFor: 'error descriptions' stamp: 'CM 9/13/2017 19:07:25'!
+!OOStack class methodsFor: 'error descriptions' stamp: 'CM 9/14/2017 21:28:13'!
 new
 
 	| objectTemporal |
-	objectTemporal _ super new.
+	objectTemporal _ self basicNew.
 	objectTemporal intializeStack.
 	^objectTemporal ! !
 
@@ -213,51 +203,72 @@ stackEmptyErrorDescription
 	^ 'Stack is empty'! !
 
 
-!classDefinition: #OONode category: #'Stack-Exercise'!
-OOStack subclass: #OONode
-	instanceVariableNames: 'nextNode value'
+!classDefinition: #OOElement category: #'Stack-Exercise'!
+OOStack subclass: #OOElement
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OONode methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 19:32:46'!
-nextNode
+!OOElement methodsFor: 'as yet unclassified' stamp: 'CM 9/14/2017 21:44:21'!
+nextElement
 
-	^nextNode ! !
+	self subclassResponsibility ! !
 
-!OONode methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 07:02:47'!
-nextNode: aNode
+!OOElement methodsFor: 'as yet unclassified' stamp: 'CM 9/14/2017 18:23:36'!
+value
 
-	nextNode _ aNode ! !
+	self subclassResponsibility ! !
 
-!OONode methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 06:15:23'!
-nextNode: aNode andValue: aValue
+
+!classDefinition: #OOStackBaseElement category: #'Stack-Exercise'!
+OOElement subclass: #OOStackBaseElement
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
 
-	self nextNode: aNode.
-	self value: aValue.! !
+!OOStackBaseElement methodsFor: 'as yet unclassified' stamp: 'CM 9/14/2017 21:44:05'!
+nextElement
 
-!OONode methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:00:05'!
+	^nil! !
+
+!OOStackBaseElement methodsFor: 'as yet unclassified' stamp: 'CM 9/14/2017 21:39:36'!
+value
+
+	^OOStack stackEmptyErrorDescription ! !
+
+
+!classDefinition: #OOStackedElement category: #'Stack-Exercise'!
+OOElement subclass: #OOStackedElement
+	instanceVariableNames: 'nextElement value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!OOStackedElement methodsFor: 'as yet unclassified' stamp: 'CM 9/14/2017 06:35:15'!
+nextElement
+	
+	^nextElement ! !
+
+!OOStackedElement methodsFor: 'as yet unclassified' stamp: 'CM 9/14/2017 06:34:50'!
+nextElement: aElement andValue: aValue
+
+	nextElement _ aElement .
+	value _ aValue.! !
+
+!OOStackedElement methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:00:05'!
 value
 
 	^value! !
 
-!OONode methodsFor: 'as yet unclassified' stamp: 'CM 9/13/2017 07:03:08'!
-value: aObject
-
-	value _ aObject ! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'OONode class' category: #'Stack-Exercise'!
-OONode class
+!classDefinition: 'OOStackedElement class' category: #'Stack-Exercise'!
+OOStackedElement class
 	instanceVariableNames: ''!
 
-!OONode class methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:28:46'!
-withNext: alink
+!OOStackedElement class methodsFor: 'as yet unclassified' stamp: 'CM 9/14/2017 06:35:56'!
+withNext: aElement andValue: aValue
 
-	^ self new nextNode: alink! !
-
-!OONode class methodsFor: 'as yet unclassified' stamp: 'CM 9/12/2017 20:28:26'!
-withNext: alink andValue: aValue
-
-	^ self new nextNode: alink andValue: aValue ! !
+	^ self new nextElement: aElement andValue: aValue ! !

@@ -403,7 +403,7 @@ test27ShouldBeAbleToBeQueryTransferNetWithCertificateOfDeposit
 	self assert: 150 = (self accountTransferNetOf: fromAccount).
 	self assert: -150 = (self accountTransferNetOf: toAccount).! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'HernanWilkinson 9/26/2011 16:29'!
+!PortfolioTest methodsFor: 'tests' stamp: 'FB 9/26/2017 12:44:15'!
 test28PortfolioTreePrinterPrintsTheCompositeInDepthFirstOrder
 
 	| account1 account2 account3 complexPortfolio composedPortfolio accountNames lines |
@@ -421,7 +421,7 @@ test28PortfolioTreePrinterPrintsTheCompositeInDepthFirstOrder
 	accountNames at: account2 put: 'account2'.
 	accountNames at: account3 put: 'account3'.
 		
-	lines := self portofolioTreeOf: composedPortfolio namingAccountWith: accountNames.
+	lines := self portfolioTreeOf: composedPortfolio namingAccountWith: accountNames.
 		
 	self assert: 5 = lines size.
 	self assert: 'composedPortfolio' = (lines at: 1).
@@ -430,7 +430,7 @@ test28PortfolioTreePrinterPrintsTheCompositeInDepthFirstOrder
 	self assert: '  account2' = (lines at: 4).
 	self assert: ' account3' = (lines at: 5).! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'HernanWilkinson 9/26/2011 16:30'!
+!PortfolioTest methodsFor: 'tests' stamp: 'FB 9/26/2017 12:43:59'!
 test29ReversePortfolioTreePrinterPrintsTheCompositeStartingFromTheLeaves
 
 	| account1 account2 account3 complexPortfolio composedPortfolio accountNames lines |
@@ -447,7 +447,7 @@ test29ReversePortfolioTreePrinterPrintsTheCompositeStartingFromTheLeaves
 	accountNames at: account2 put: 'account2'.
 	accountNames at: account3 put: 'account3'.
 		
-	lines := self reversePortofolioTreeOf: composedPortfolio namingAccountWith: accountNames.
+	lines := self reversePortfolioTreeOf: composedPortfolio namingAccountWith: accountNames.
 		
 	self assert: 5 = lines size.
 	self assert: ' account3' = (lines at: 1).
@@ -463,30 +463,80 @@ accountSummaryLinesOf: aReceptiveAccount
 	
 	^ AccountSummary accountSummary: aReceptiveAccount ! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'CM 9/26/2017 06:02:25'!
+!PortfolioTest methodsFor: 'test support' stamp: 'FB 9/26/2017 12:37:48'!
 accountTransferNetOf: aReceptiveAccount 
 	
-	^aReceptiveAccount netTransfersBalance ! !
+	^(AccountBalanceManager for: aReceptiveAccount) netTransfersBalance.! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'CM 9/26/2017 06:27:20'!
+!PortfolioTest methodsFor: 'test support' stamp: 'FB 9/26/2017 12:29:32'!
 investmentEarningsOf: aReceptiveAccount 
 	
-	^ aReceptiveAccount earningsInvestmentsBalance! !
+	^(AccountBalanceManager for: aReceptiveAccount )earningsInvestmentsBalance! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'CM 9/26/2017 06:03:55'!
+!PortfolioTest methodsFor: 'test support' stamp: 'FB 9/26/2017 12:29:47'!
 investmentNetOf: aReceptiveAccount 
 	
-	^ aReceptiveAccount netInvestmentsBalance! !
+	^(AccountBalanceManager for: aReceptiveAccount) netInvestmentsBalance! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
-portofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
+!PortfolioTest methodsFor: 'test support' stamp: 'FB 9/26/2017 12:44:36'!
+portfolioTreeOf: aPortfolio namingAccountWith: aDictionary 
 	
 	self shouldBeImplemented ! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
-reversePortofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
+!PortfolioTest methodsFor: 'test support' stamp: 'FB 9/26/2017 12:44:47'!
+reversePortfolioTreeOf: aPortfolio namingAccountWith: aDictionary 
 	
 	self shouldBeImplemented ! !
+
+
+!classDefinition: #AccountBalanceManager category: #'PortfolioTreePrinter-Ejercicio'!
+Object subclass: #AccountBalanceManager
+	instanceVariableNames: 'managedAccount'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!AccountBalanceManager methodsFor: 'balance calculation' stamp: 'FB 9/26/2017 12:40:20'!
+earningsInvestmentsBalance
+	
+	| certificatesOfDeposit |
+	
+	certificatesOfDeposit  _ managedAccount transactions select: [ :transaction | transaction isKindOf: CertificateOfDeposit ] . 
+	^certificatesOfDeposit sum: [ :transaction | transaction profit ].! !
+
+!AccountBalanceManager methodsFor: 'balance calculation' stamp: 'FB 9/26/2017 12:40:28'!
+netInvestmentsBalance
+		
+	| certificateOfDeposit |
+	
+	certificateOfDeposit _ managedAccount transactions select: [ :transaction | transaction isKindOf: CertificateOfDeposit ].
+	^((certificateOfDeposit  inject: 0 into: [ :balance :certificate | certificate affectBalance: balance ]) negated).! !
+
+!AccountBalanceManager methodsFor: 'balance calculation' stamp: 'FB 9/26/2017 12:40:33'!
+netTransfersBalance
+	
+	| transfers |
+	
+	transfers _ managedAccount transactions select: [ :transaction | (transaction isKindOf: TransferDeposit) or: (transaction isKindOf: TransferWithdraw) ].
+	^transfers inject: 0 into: [ :balance :transfer | transfer affectBalance: balance ].! !
+
+
+!AccountBalanceManager methodsFor: 'initialization' stamp: 'FB 9/26/2017 12:41:00'!
+initializeFor: anAccount
+
+	managedAccount _ anAccount.
+	! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'AccountBalanceManager class' category: #'PortfolioTreePrinter-Ejercicio'!
+AccountBalanceManager class
+	instanceVariableNames: ''!
+
+!AccountBalanceManager class methodsFor: 'instance creation' stamp: 'FB 9/26/2017 11:54:11'!
+for: anAccount
+
+	^self new initializeFor: anAccount! !
 
 
 !classDefinition: #AccountSummary category: #'PortfolioTreePrinter-Ejercicio'!
@@ -517,6 +567,7 @@ Object subclass: #AccountTransaction
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
+
 
 !AccountTransaction methodsFor: 'evaluating' stamp: 'CM 9/25/2017 21:06:58'!
 affectBalance: balance 
@@ -850,6 +901,7 @@ transactions
 
 	self subclassResponsibility ! !
 
+
 
 !classDefinition: #Portfolio category: #'PortfolioTreePrinter-Ejercicio'!
 SummarizingAccount subclass: #Portfolio
@@ -857,6 +909,7 @@ SummarizingAccount subclass: #Portfolio
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
+
 
 !Portfolio methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 19:22'!
 manages: anAccount
@@ -892,6 +945,13 @@ transactionsOf: anAccount
 	! !
 
 
+!Portfolio methodsFor: 'initialization' stamp: 'FB 9/23/2017 16:11:18'!
+initializeWith: aCollectionOfAccounts
+
+	accounts := aCollectionOfAccounts.
+
+	! !
+
 !Portfolio methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 19:19'!
 initializeWithAll: aCollectionOfAccounts
 
@@ -919,6 +979,7 @@ withAll: aCollectionOfAccounts
 				(sourceAccount manages: targetAccount) ifTrue: [ self error: self accountAlreadyManagedErrorMessage ]]]].
 	
 	^self new initializeWithAll: aCollectionOfAccounts ! !
+
 
 
 !Portfolio class methodsFor: 'assertions' stamp: 'HernanWilkinson 9/18/2011 17:22'!
@@ -976,30 +1037,6 @@ balance
 
 	^ transactions inject: 0 into: [ :balance :transaction | transaction affectBalance: balance ] .! !
 
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'CM 9/26/2017 06:10:25'!
-earningsInvestmentsBalance
-
-	^ transactions inject: 0 into: [ :balance :transaction | 
-		( transaction isKindOf: CertificateOfDeposit )
-			ifTrue: [transaction profit + balance ] 
-			ifFalse: [balance] ] ! !
-
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'CM 9/26/2017 06:04:45'!
-netInvestmentsBalance
-
-	^ (transactions inject: 0 into: [ :balance :transaction | 
-		( transaction isKindOf: CertificateOfDeposit )
-			ifTrue: [transaction affectBalance: balance] 
-			ifFalse: [balance] ] ) negated .! !
-
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'CM 9/26/2017 06:01:58'!
-netTransfersBalance
-
-	^ transactions inject: 0 into: [ :balance :transaction | 
-		( (transaction isKindOf: TransferDeposit ) or: (transaction isKindOf: TransferWithdraw ) )
-			ifTrue: [transaction affectBalance: balance] 
-			ifFalse: [balance] ] .! !
-
 !ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
 register: aTransaction
 
@@ -1010,6 +1047,7 @@ register: aTransaction
 transactions 
 
 	^ transactions copy! !
+
 
 
 !ReceptiveAccount methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:37'!

@@ -478,15 +478,16 @@ investmentNetOf: aReceptiveAccount
 	
 	^(AccountBalanceManager for: aReceptiveAccount) netInvestmentsBalance! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'FB 9/26/2017 12:44:36'!
+!PortfolioTest methodsFor: 'test support' stamp: 'CM 9/27/2017 06:13:56'!
 portfolioTreeOf: aPortfolio namingAccountWith: aDictionary 
 	
-	self shouldBeImplemented ! !
+	^ ( aPortfolio treePrintNamingAccountWith: aDictionary andDepth: '' )
+! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'FB 9/26/2017 12:44:47'!
+!PortfolioTest methodsFor: 'test support' stamp: 'CM 9/27/2017 06:22:05'!
 reversePortfolioTreeOf: aPortfolio namingAccountWith: aDictionary 
 	
-	self shouldBeImplemented ! !
+	^( aPortfolio treePrintNamingAccountWith: aDictionary andDepth: '' ) reverse.! !
 
 
 !classDefinition: #AccountBalanceManager category: #'PortfolioTreePrinter-Ejercicio'!
@@ -496,26 +497,20 @@ Object subclass: #AccountBalanceManager
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!AccountBalanceManager methodsFor: 'balance calculation' stamp: 'CM 9/26/2017 17:39:35'!
+!AccountBalanceManager methodsFor: 'balance calculation' stamp: 'CM 9/27/2017 06:25:58'!
 earningsInvestmentsBalance
 	
-	  ^ managedAccount transactions inject: 0 into: [ :balance :transaction | balance + transaction earnings ] ! !
+	  ^ managedAccount transactions inject: 0 into: [ :balance :transaction | transaction affectEarnings: balance ] ! !
 
-!AccountBalanceManager methodsFor: 'balance calculation' stamp: 'FB 9/26/2017 12:40:28'!
+!AccountBalanceManager methodsFor: 'balance calculation' stamp: 'CM 9/27/2017 05:21:50'!
 netInvestmentsBalance
 		
-	| certificateOfDeposit |
-	
-	certificateOfDeposit _ managedAccount transactions select: [ :transaction | transaction isKindOf: CertificateOfDeposit ].
-	^((certificateOfDeposit  inject: 0 into: [ :balance :certificate | certificate affectBalance: balance ]) negated).! !
+	  ^ managedAccount transactions inject: 0 into: [ :balance :transaction | transaction affectNetInvestments: balance ] ! !
 
-!AccountBalanceManager methodsFor: 'balance calculation' stamp: 'FB 9/26/2017 12:40:33'!
+!AccountBalanceManager methodsFor: 'balance calculation' stamp: 'CM 9/27/2017 05:21:26'!
 netTransfersBalance
 	
-	| transfers |
-	
-	transfers _ managedAccount transactions select: [ :transaction | (transaction isKindOf: TransferDeposit) or: (transaction isKindOf: TransferWithdraw) ].
-	^transfers inject: 0 into: [ :balance :transfer | transfer affectBalance: balance ].! !
+	  ^ managedAccount transactions inject: 0 into: [ :balance :transaction | transaction affectNetTransfers: balance ] ! !
 
 
 !AccountBalanceManager methodsFor: 'initialization' stamp: 'FB 9/26/2017 12:41:00'!
@@ -570,10 +565,20 @@ affectBalance: balance
 
 	self subclassResponsibility ! !
 
-!AccountTransaction methodsFor: 'evaluating' stamp: 'CM 9/26/2017 17:32:25'!
-earnings
+!AccountTransaction methodsFor: 'evaluating' stamp: 'CM 9/27/2017 06:24:32'!
+affectEarnings: aEarningsBalance
 
-	^0! !
+	^aEarningsBalance ! !
+
+!AccountTransaction methodsFor: 'evaluating' stamp: 'CM 9/27/2017 05:16:41'!
+affectNetInvestments: aInvestmentsBalance
+
+	^aInvestmentsBalance ! !
+
+!AccountTransaction methodsFor: 'evaluating' stamp: 'CM 9/27/2017 05:16:08'!
+affectNetTransfers: aTransfersBalance
+
+	^aTransfersBalance ! !
 
 !AccountTransaction methodsFor: 'evaluating' stamp: 'HernanWilkinson 7/14/2011 06:48'!
 value
@@ -630,10 +635,15 @@ affectBalance: aBalance
 
 	^ aBalance - self value! !
 
-!CertificateOfDeposit methodsFor: 'evaluating' stamp: 'CM 9/26/2017 17:34:53'!
-earnings
+!CertificateOfDeposit methodsFor: 'evaluating' stamp: 'CM 9/27/2017 06:25:26'!
+affectEarnings: aEarningsBalance
 
-	^ (value*(tna/360)*numberOfDays)! !
+	^( aEarningsBalance + (value*(tna/360)*numberOfDays) )! !
+
+!CertificateOfDeposit methodsFor: 'evaluating' stamp: 'CM 9/27/2017 05:26:18'!
+affectNetInvestments: aInvestmentsBalance
+
+	^ ( aInvestmentsBalance + self value ) ! !
 
 !CertificateOfDeposit methodsFor: 'evaluating' stamp: 'CM 9/26/2017 05:53:52'!
 value
@@ -732,6 +742,11 @@ affectBalance: balance
 
 	^ balance + self value! !
 
+!TransferDeposit methodsFor: 'evaluating' stamp: 'CM 9/27/2017 05:19:24'!
+affectNetTransfers: aTransfersBalance
+
+	^ ( self affectBalance: aTransfersBalance )! !
+
 !TransferDeposit methodsFor: 'evaluating' stamp: 'CM 9/26/2017 03:19:53'!
 value
 
@@ -783,6 +798,12 @@ initializeFor: aTransfer
 affectBalance: balance 
 
 	^ balance - self value! !
+
+!TransferWithdraw methodsFor: 'evaluating' stamp: 'CM 9/27/2017 05:18:23'!
+affectNetTransfers: aTransfersBalance
+
+	^ ( self affectBalance: aTransfersBalance )
+	! !
 
 !TransferWithdraw methodsFor: 'evaluating' stamp: 'CM 9/26/2017 03:20:34'!
 value
@@ -951,6 +972,16 @@ initializeWithAll: aCollectionOfAccounts
 
 	accounts := aCollectionOfAccounts   ! !
 
+
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'CM 9/27/2017 06:18:20'!
+treePrintNamingAccountWith: aDictionary andDepth: anString
+	
+	| lines |
+	lines _ OrderedCollection new.
+	lines add: (anString, ( aDictionary at: self )). 
+	accounts do: [ :anAccount | lines addAll: ( anAccount treePrintNamingAccountWith: aDictionary andDepth: (anString,' ') ) ].
+	^ lines! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: #'PortfolioTreePrinter-Ejercicio'!
@@ -1053,6 +1084,14 @@ registers: aTtransaction
 
 	^ transactions includes: aTtransaction 
 ! !
+
+
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'CM 9/27/2017 06:18:43'!
+treePrintNamingAccountWith: aDictionary andDepth: anString
+	| line |
+	line _ OrderedCollection new.
+	line add: (anString, ( aDictionary at: self )). 
+	^ line! !
 
 
 !classDefinition: #Transfer category: #'PortfolioTreePrinter-Ejercicio'!

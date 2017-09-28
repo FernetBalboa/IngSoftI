@@ -478,16 +478,16 @@ investmentNetOf: aReceptiveAccount
 	
 	^(AccountBalanceManager for: aReceptiveAccount) netInvestmentsBalance! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'CM 9/27/2017 06:13:56'!
+!PortfolioTest methodsFor: 'test support' stamp: 'CM 9/28/2017 04:51:23'!
 portfolioTreeOf: aPortfolio namingAccountWith: aDictionary 
 	
-	^ ( aPortfolio treePrintNamingAccountWith: aDictionary andDepth: '' )
+	^ AccountViewer showHierarchyOf: aPortfolio namingAccountWith: aDictionary 
 ! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'CM 9/27/2017 06:22:05'!
+!PortfolioTest methodsFor: 'test support' stamp: 'CM 9/28/2017 04:54:00'!
 reversePortfolioTreeOf: aPortfolio namingAccountWith: aDictionary 
 	
-	^( aPortfolio treePrintNamingAccountWith: aDictionary andDepth: '' ) reverse.! !
+	^ AccountViewer showReverseHierarchyOf: aPortfolio namingAccountWith: aDictionary ! !
 
 
 !classDefinition: #AccountBalanceManager category: #'PortfolioTreePrinter-Ejercicio'!
@@ -702,27 +702,6 @@ accountSummaryLine
 
 	^ 'Deposito por ', value printString! !
 
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'Deposit class' category: #'PortfolioTreePrinter-Ejercicio'!
-Deposit class
-	instanceVariableNames: ''!
-
-!Deposit class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:38'!
-for: aValue
-
-	^ self new initializeFor: aValue ! !
-
-!Deposit class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 19:41'!
-register: aValue on: account
-
-	| withdraw |
-	
-	withdraw := self for: aValue.
-	account register: withdraw.
-		
-	^ withdraw! !
-
 
 !classDefinition: #TransferDeposit category: #'PortfolioTreePrinter-Ejercicio'!
 AccountTransaction subclass: #TransferDeposit
@@ -757,28 +736,6 @@ value
 accountSummaryLine
 
 	^ 'Transferencia por ', self value printString! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'TransferDeposit class' category: #'PortfolioTreePrinter-Ejercicio'!
-TransferDeposit class
-	instanceVariableNames: ''!
-
-!TransferDeposit class methodsFor: 'as yet unclassified' stamp: 'CM 9/26/2017 02:59:00'!
-for: aTransfer
-
-	^ self new initializeFor: aTransfer.
-	! !
-
-!TransferDeposit class methodsFor: 'as yet unclassified' stamp: 'CM 9/26/2017 02:59:09'!
-register: aTransfer on: account
-
-	| deposit |
-	
-	deposit _ self for: aTransfer.
-	account register: deposit.
-		
-	^ deposit ! !
 
 
 !classDefinition: #TransferWithdraw category: #'PortfolioTreePrinter-Ejercicio'!
@@ -816,28 +773,6 @@ accountSummaryLine
 
 	^ 'Transferencia por -', self value printString! !
 
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'TransferWithdraw class' category: #'PortfolioTreePrinter-Ejercicio'!
-TransferWithdraw class
-	instanceVariableNames: ''!
-
-!TransferWithdraw class methodsFor: 'as yet unclassified' stamp: 'CM 9/26/2017 03:00:47'!
-for: aTransfer
-
-	^ self new initializeFor: aTransfer.
-	! !
-
-!TransferWithdraw class methodsFor: 'as yet unclassified' stamp: 'CM 9/26/2017 03:00:07'!
-register: aTransfer on: account
-
-	| withdraw |
-	
-	withdraw _ self for: aTransfer.
-	account register: withdraw.
-		
-	^ withdraw! !
-
 
 !classDefinition: #Withdraw category: #'PortfolioTreePrinter-Ejercicio'!
 AccountTransaction subclass: #Withdraw
@@ -868,26 +803,29 @@ accountSummaryLine
 
 	^ 'Extraccion por ', value printString! !
 
+
+!classDefinition: #AccountViewer category: #'PortfolioTreePrinter-Ejercicio'!
+Object subclass: #AccountViewer
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Withdraw class' category: #'PortfolioTreePrinter-Ejercicio'!
-Withdraw class
+!classDefinition: 'AccountViewer class' category: #'PortfolioTreePrinter-Ejercicio'!
+AccountViewer class
 	instanceVariableNames: ''!
 
-!Withdraw class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:33'!
-for: aValue
+!AccountViewer class methodsFor: 'as yet unclassified' stamp: 'CM 9/28/2017 05:22:26'!
+showHierarchyOf: anSummarizingAccount namingAccountWith: aDictionaryOfAccounts
 
-	^ self new initializeFor: aValue ! !
+	^ ( anSummarizingAccount accountTreeViewNamingWith: aDictionaryOfAccounts andInitialDepth: '' )! !
 
-!Withdraw class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/14/2011 05:32'!
-register: aValue on: account
+!AccountViewer class methodsFor: 'as yet unclassified' stamp: 'CM 9/28/2017 04:53:10'!
+showReverseHierarchyOf: anSummarizingAccount namingAccountWith: aDictionaryOfAccounts
 
-	| withdraw |
-	
-	withdraw := self for: aValue.
-	account register: withdraw.
-		
-	^ withdraw! !
+	^ ( self showHierarchyOf: anSummarizingAccount namingAccountWith: aDictionaryOfAccounts ) reverse ! !
 
 
 !classDefinition: #SummarizingAccount category: #'PortfolioTreePrinter-Ejercicio'!
@@ -973,14 +911,15 @@ initializeWithAll: aCollectionOfAccounts
 	accounts := aCollectionOfAccounts   ! !
 
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'CM 9/27/2017 06:18:20'!
-treePrintNamingAccountWith: aDictionary andDepth: anString
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'CM 9/28/2017 05:23:04'!
+accountTreeViewNamingWith: aDictionary andInitialDepth: anString
 	
 	| lines |
 	lines _ OrderedCollection new.
 	lines add: (anString, ( aDictionary at: self )). 
-	accounts do: [ :anAccount | lines addAll: ( anAccount treePrintNamingAccountWith: aDictionary andDepth: (anString,' ') ) ].
-	^ lines! !
+	accounts do: [ :anAccount | lines addAll: ( anAccount accountTreeViewNamingWith: aDictionary andInitialDepth: (anString,' ') ) ].
+	^ lines
+	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1086,8 +1025,9 @@ registers: aTtransaction
 ! !
 
 
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'CM 9/27/2017 06:18:43'!
-treePrintNamingAccountWith: aDictionary andDepth: anString
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'CM 9/28/2017 05:22:09'!
+accountTreeViewNamingWith: aDictionary andInitialDepth: anString
+
 	| line |
 	line _ OrderedCollection new.
 	line add: (anString, ( aDictionary at: self )). 

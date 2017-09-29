@@ -468,7 +468,7 @@ test29ReversePortfolioTreePrinterPrintsTheCompositeStartingFromTheLeaves
 	self assert: 'composedPortfolio' = (lines at: 5).
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'HAW 8/13/2017 17:52:44'!
+!PortfolioTest methodsFor: 'tests' stamp: 'CM 9/28/2017 20:16:38'!
 test30AccountSummaryWithInvestmentEarningsShouldNotTakeTooLong
 
 	| fromAccount toAccount lines |
@@ -479,7 +479,7 @@ test30AccountSummaryWithInvestmentEarningsShouldNotTakeTooLong
 	Withdraw register: 50 on: fromAccount.
 	Transfer register: 100 from: fromAccount to: toAccount.
 	CertificateOfDeposit register: 1000 during: 360 at: 1/10 on: fromAccount.
-		
+	
 	self 
 		should: [ lines := (AccountSummaryWithInvestmentEarnings for: fromAccount) lines ]
 		notTakeMoreThanMilliseconds: 1100.	
@@ -570,16 +570,20 @@ initializeFor: aReceptiveAccount
 	
 	account := aReceptiveAccount ! !
 
-!AccountSummaryWithAllInvestmentInformation methodsFor: 'as yet unclassified' stamp: 'HernanWilkinson 7/17/2011 23:58'!
+!AccountSummaryWithAllInvestmentInformation methodsFor: 'as yet unclassified' stamp: 'CM 9/28/2017 21:06:53'!
 lines 
 
-	| lines investmentEarnings |
+	| lines investmentEarnings linesThread earningsLine |
+	
 	
 	investmentEarnings := InvestmentNetVisitor for: account.
-	lines := (AccountSummaryWithInvestmentEarnings for: account) lines.
-	lines add: 'Inversiones por ', investmentEarnings value printString.
+	linesThread _ ThreadParallelExecution for: [(AccountSummaryWithInvestmentEarnings for: account) lines].
+	earningsLine _ ('Inversiones por ', investmentEarnings value printString).
+	lines _ linesThread value.
+	lines add: earningsLine .
 	
-	 ^ lines! !
+	 ^ lines
+	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -605,16 +609,18 @@ initializeFor: aReceptiveAccount
 	
 	account := aReceptiveAccount ! !
 
-!AccountSummaryWithInvestmentEarnings methodsFor: 'as yet unclassified' stamp: 'HernanWilkinson 7/17/2011 23:53'!
+!AccountSummaryWithInvestmentEarnings methodsFor: 'as yet unclassified' stamp: 'CM 9/28/2017 21:11:38'!
 lines 
 
-	| lines investmentEarnings |
+	| lines investmentEarnings linesThread earningsLine |
 	
 	investmentEarnings := InvestmentEarningVisitor for: account.
-	lines := (AccountSummary for: account) lines.
-	lines add: 'Ganancias por ', investmentEarnings value printString.
-	
-	 ^ lines! !
+	linesThread _ ThreadParallelExecution for: [ (AccountSummary for: account) lines].
+	earningsLine _ ('Ganancias por ', investmentEarnings value printString).
+	lines _ linesThread value.
+	lines add: earningsLine.
+	 
+	^ lines! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1561,6 +1567,39 @@ ReversePortfolioTreePrinter class
 of: aPortfolio namingAccountsWith: aDictionary 
 	
 	^ self new initializeOf: aPortfolio namingAccountsWith: aDictionary 
+	! !
+
+
+!classDefinition: #ThreadParallelExecution category: #'PortfolioTimeConsuming-Ejercicio'!
+Object subclass: #ThreadParallelExecution
+	instanceVariableNames: 'semaphore value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTimeConsuming-Ejercicio'!
+
+!ThreadParallelExecution methodsFor: 'as yet unclassified' stamp: 'CM 9/28/2017 21:02:49'!
+initializeFor: aBlock
+		
+	semaphore _ Semaphore new.
+	[value _ aBlock value. semaphore signal] fork.! !
+
+!ThreadParallelExecution methodsFor: 'as yet unclassified' stamp: 'CM 9/28/2017 21:03:08'!
+value
+	
+	semaphore wait.
+	^value ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ThreadParallelExecution class' category: #'PortfolioTimeConsuming-Ejercicio'!
+ThreadParallelExecution class
+	instanceVariableNames: ''!
+
+!ThreadParallelExecution class methodsFor: 'as yet unclassified' stamp: 'CM 9/28/2017 20:53:40'!
+for: aBlock
+
+	^ self new initializeFor: aBlock.
+
 	! !
 
 

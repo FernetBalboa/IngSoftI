@@ -332,13 +332,13 @@ test24CabinHasToStopAndWaitForPeopleOnFloorsOnItsWayNoMatterHowTheyWellCalled
 	self assert: elevatorController isCabinDoorClosing.! !
 
 
-!ElevatorTest methodsFor: 'tests 1' stamp: 'HernanWilkinson 7/10/2011 17:33'!
+!ElevatorTest methodsFor: 'tests 1' stamp: 'FB 10/2/2017 18:26:48'!
 test01ElevatorStartsIdleWithDoorOpenOnFloorZero
 
 	| elevatorController |
 		
 	elevatorController := ElevatorController new.
-		
+	
 	self assert: elevatorController isIdle.
 	self assert: elevatorController isCabinStopped.
 	self assert: elevatorController isCabinDoorOpened.
@@ -468,25 +468,25 @@ CabinDoorState subclass: #CabinDoorClosedState
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!CabinDoorClosedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:39:48'!
+!CabinDoorClosedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:50:00'!
 isClosed
 
-	^True.! !
+	^true.! !
 
-!CabinDoorClosedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:39:43'!
+!CabinDoorClosedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:50:05'!
 isClosing
 
-	^False.! !
+	^false.! !
 
-!CabinDoorClosedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:39:33'!
+!CabinDoorClosedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:50:10'!
 isOpened
 
-	^False.! !
+	^false.! !
 
-!CabinDoorClosedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:39:40'!
+!CabinDoorClosedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:50:15'!
 isOpening
 
-	^False.! !
+	^false.! !
 
 
 !classDefinition: #CabinDoorClosingState category: #'Elevator-Ejercicio'!
@@ -496,25 +496,25 @@ CabinDoorState subclass: #CabinDoorClosingState
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!CabinDoorClosingState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:38:50'!
+!CabinDoorClosingState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:49:26'!
 isClosed
 
-	^False.! !
+	^false.! !
 
-!CabinDoorClosingState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:38:55'!
+!CabinDoorClosingState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:49:31'!
 isClosing
 
-	^True.! !
+	^true.! !
 
-!CabinDoorClosingState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:38:43'!
+!CabinDoorClosingState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:49:40'!
 isOpened
 
-	^False.! !
+	^false.! !
 
-!CabinDoorClosingState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:38:46'!
+!CabinDoorClosingState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:49:45'!
 isOpening
 
-	^False.! !
+	^false.! !
 
 
 !classDefinition: #CabinDoorOpenedState category: #'Elevator-Ejercicio'!
@@ -524,25 +524,25 @@ CabinDoorState subclass: #CabinDoorOpenedState
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!CabinDoorOpenedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:38:17'!
+!CabinDoorOpenedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:48:57'!
 isClosed
 
-	^False.! !
+	^false.! !
 
-!CabinDoorOpenedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:38:04'!
+!CabinDoorOpenedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:49:04'!
 isClosing
 
-	^False.! !
+	^false.! !
 
-!CabinDoorOpenedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:38:27'!
+!CabinDoorOpenedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:49:13'!
 isOpened
 
-	^True.! !
+	^true.! !
 
-!CabinDoorOpenedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:38:08'!
+!CabinDoorOpenedState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:49:18'!
 isOpening
 
-	^False.! !
+	^false.! !
 
 
 !classDefinition: #CabinDoorOpeningState category: #'Elevator-Ejercicio'!
@@ -552,25 +552,25 @@ CabinDoorState subclass: #CabinDoorOpeningState
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!CabinDoorOpeningState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:37:28'!
+!CabinDoorOpeningState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:48:46'!
 isClosed
 
-	^False.! !
+	^false.! !
 
-!CabinDoorOpeningState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:37:30'!
+!CabinDoorOpeningState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:48:40'!
 isClosing
 
-	^False.! !
+	^false.! !
 
-!CabinDoorOpeningState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:37:22'!
+!CabinDoorOpeningState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:46:32'!
 isOpened
 
-	^False.! !
+	^false.! !
 
-!CabinDoorOpeningState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 15:37:37'!
+!CabinDoorOpeningState methodsFor: 'cabin door status' stamp: 'FB 10/2/2017 18:46:27'!
 isOpening
 
-	^True.! !
+	^true.! !
 
 
 !classDefinition: #CabinState category: #'Elevator-Ejercicio'!
@@ -598,15 +598,15 @@ CabinState subclass: #CabinMovingState
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!CabinMovingState methodsFor: 'cabin status' stamp: 'FB 10/2/2017 15:34:21'!
+!CabinMovingState methodsFor: 'cabin status' stamp: 'FB 10/2/2017 18:51:32'!
 isMoving
 
-	^True.! !
+	^true.! !
 
-!CabinMovingState methodsFor: 'cabin status' stamp: 'FB 10/2/2017 15:34:29'!
+!CabinMovingState methodsFor: 'cabin status' stamp: 'FB 10/2/2017 18:51:36'!
 isStopped
 
-	^False.! !
+	^false.! !
 
 
 !classDefinition: #CabinStoppedState category: #'Elevator-Ejercicio'!
@@ -616,15 +616,15 @@ CabinState subclass: #CabinStoppedState
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!CabinStoppedState methodsFor: 'cabin status' stamp: 'FB 10/2/2017 15:34:58'!
+!CabinStoppedState methodsFor: 'cabin status' stamp: 'FB 10/2/2017 18:51:41'!
 isMoving
 
-	^False.! !
+	^false.! !
 
-!CabinStoppedState methodsFor: 'cabin status' stamp: 'FB 10/2/2017 15:34:51'!
+!CabinStoppedState methodsFor: 'cabin status' stamp: 'FB 10/2/2017 18:53:42'!
 isStopped
 
-	^True.! !
+	^true.! !
 
 
 !classDefinition: #ElevatorController category: #'Elevator-Ejercicio'!
@@ -677,20 +677,22 @@ isCabinDoorOpening
 	^cabinDoorState isOpening.! !
 
 
-!ElevatorController methodsFor: 'cabin door control' stamp: 'FB 10/2/2017 15:59:48'!
+!ElevatorController methodsFor: 'cabin door control' stamp: 'FB 10/2/2017 19:04:19'!
 cabinDoorClosed
 
-	cabinDoorState _ CabinDoorClosedState new.! !
+	cabinDoorState _ CabinDoorClosedState new.
+	cabinState _ CabinMovingState new.! !
 
-!ElevatorController methodsFor: 'cabin door control' stamp: 'FB 10/2/2017 16:05:59'!
+!ElevatorController methodsFor: 'cabin door control' stamp: 'FB 10/2/2017 21:21:19'!
 cabinDoorClosing
 
-	cabinDoorState _ CabinDoorClosingState new.! !
+	(state isIdle or: cabinState isMoving) ifFalse: [cabinDoorState _ CabinDoorClosingState new].! !
 
-!ElevatorController methodsFor: 'cabin door control' stamp: 'FB 10/2/2017 16:06:12'!
+!ElevatorController methodsFor: 'cabin door control' stamp: 'FB 10/2/2017 19:30:42'!
 cabinDoorOpened
 
-	cabinDoorState _ CabinDoorOpenedState new.! !
+	cabinDoorState _ CabinDoorOpenedState new.
+	floorsToGo isEmpty ifTrue: [ state _ ElevatorIdleState new.]! !
 
 !ElevatorController methodsFor: 'cabin door control' stamp: 'FB 10/2/2017 16:05:43'!
 cabinDoorOpening
@@ -703,10 +705,12 @@ closeCabinDoor
 	"Stop waiting for people"
 	self cabinDoorClosing.! !
 
-!ElevatorController methodsFor: 'cabin door control' stamp: 'FB 10/2/2017 16:16:03'!
+!ElevatorController methodsFor: 'cabin door control' stamp: 'FB 10/2/2017 19:28:14'!
 openCabinDoor
 
-	self isStopped ifTrue: self cabinDoorOpening.! !
+	(cabinDoorState isOpened or: cabinState isMoving) 
+		ifFalse: [cabinDoorState _ CabinDoorOpeningState new].
+	! !
 
 
 !ElevatorController methodsFor: 'cabin floor' stamp: 'FB 10/2/2017 15:57:20'!
@@ -714,11 +718,23 @@ cabinFloorNumber
 
 	^cabinFloorNumber.! !
 
-!ElevatorController methodsFor: 'cabin floor' stamp: 'FB 10/2/2017 16:04:06'!
+!ElevatorController methodsFor: 'cabin floor' stamp: 'FB 10/2/2017 20:53:16'!
 cabinOnFloor: aFloorNumber
 
 	cabinFloorNumber _ aFloorNumber.
-	(aFloorNumber = floorsToGo first) ifTrue: self cabinStop cabinDoorOpening.! !
+	"(aFloorNumber = floorsToGo first) ifTrue: self cabinStop cabinDoorOpening."
+	self cabinStop.
+	self  openCabinDoor.
+	state waitingForPeople: true.
+	floorsToGo  remove: aFloorNumber.
+! !
+
+!ElevatorController methodsFor: 'cabin floor' stamp: 'FB 10/2/2017 21:00:10'!
+goUpPushedFromFloor: aFloorNumber
+ 
+	floorsToGo add: aFloorNumber.
+	state _ ElevatorWorkingState for: state isWaitingForPeople.
+	cabinDoorState  _ CabinDoorClosingState new.! !
 
 
 !ElevatorController methodsFor: 'cabin status' stamp: 'FB 10/2/2017 16:04:48'!
@@ -736,16 +752,27 @@ isCabinStopped
 
 	^cabinState isStopped.! !
 
+!ElevatorController methodsFor: 'cabin status' stamp: 'FB 10/2/2017 20:55:02'!
+isCabinWaitingForPeople
+	^state isWaitingForPeople.! !
+
+!ElevatorController methodsFor: 'cabin status' stamp: 'FB 10/2/2017 21:03:25'!
+waitForPeopleTimedOut
+	state waitingForPeople: false.
+	cabinDoorState _ CabinDoorClosingState new.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'ElevatorController class' category: #'Elevator-Ejercicio'!
 ElevatorController class
 	instanceVariableNames: ''!
 
-!ElevatorController class methodsFor: 'instance creation' stamp: 'FB 10/2/2017 15:45:28'!
+!ElevatorController class methodsFor: 'instance creation' stamp: 'FB 10/2/2017 20:47:57'!
 new
 
-	^self new initializeWithElevatorState: ElevatorIdleState cabinState: CabinStoppedState cabinDoorState: CabinDoorOpenedState cabinFloorNumber: 0 floorsToGo: OrderedCollection new.! !
+	^(self basicNew initializeWithElevatorState: ElevatorIdleState new cabinState: CabinStoppedState new cabinDoorState: CabinDoorOpenedState new cabinFloorNumber: 0 floorsToGo: SortedCollection new).
+	
+	! !
 
 
 !classDefinition: #ElevatorState category: #'Elevator-Ejercicio'!
@@ -757,6 +784,11 @@ Object subclass: #ElevatorState
 
 !ElevatorState methodsFor: 'elevator status' stamp: 'FB 10/2/2017 15:30:32'!
 isIdle
+
+	self subclassResponsibility.! !
+
+!ElevatorState methodsFor: 'elevator status' stamp: 'FB 10/2/2017 19:54:49'!
+isWaitingForPeople
 
 	self subclassResponsibility.! !
 
@@ -773,30 +805,72 @@ ElevatorState subclass: #ElevatorIdleState
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!ElevatorIdleState methodsFor: 'elevator status' stamp: 'FB 10/2/2017 15:32:07'!
+!ElevatorIdleState methodsFor: 'elevator status' stamp: 'FB 10/2/2017 18:50:59'!
 isIdle
 	
-	^True.! !
+	^true.! !
 
-!ElevatorIdleState methodsFor: 'elevator status' stamp: 'FB 10/2/2017 15:31:56'!
+!ElevatorIdleState methodsFor: 'elevator status' stamp: 'FB 10/2/2017 19:53:22'!
+isWaitingForPeople
+
+	^false ! !
+
+!ElevatorIdleState methodsFor: 'elevator status' stamp: 'FB 10/2/2017 18:50:53'!
 isWorking
 	
-	^False.! !
+	^false.! !
 
 
 !classDefinition: #ElevatorWorkingState category: #'Elevator-Ejercicio'!
 ElevatorState subclass: #ElevatorWorkingState
-	instanceVariableNames: ''
+	instanceVariableNames: 'waitingForPeople'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
-!ElevatorWorkingState methodsFor: 'elevator status' stamp: 'FB 10/2/2017 15:32:23'!
+!ElevatorWorkingState methodsFor: 'elevator status' stamp: 'FB 10/2/2017 18:50:46'!
 isIdle
 
-	^False.! !
+	^false.! !
 
-!ElevatorWorkingState methodsFor: 'elevator status' stamp: 'FB 10/2/2017 15:31:30'!
+!ElevatorWorkingState methodsFor: 'elevator status' stamp: 'FB 10/2/2017 19:48:30'!
+isWaitingForPeople
+
+	^ waitingForPeople.! !
+
+!ElevatorWorkingState methodsFor: 'elevator status' stamp: 'FB 10/2/2017 18:50:41'!
 isWorking
 
-	^True.! !
+	^true.! !
+
+
+!ElevatorWorkingState methodsFor: 'initialize' stamp: 'FB 10/2/2017 20:48:47'!
+initialize
+
+	waitingForPeople _ false. ! !
+
+!ElevatorWorkingState methodsFor: 'initialize' stamp: 'FB 10/2/2017 21:01:23'!
+initialize: aBoolean
+
+	waitingForPeople _ aBoolean. ! !
+
+!ElevatorWorkingState methodsFor: 'initialize' stamp: 'FB 10/2/2017 20:53:06'!
+waitingForPeople: aBoolean
+
+	waitingForPeople _ aBoolean.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ElevatorWorkingState class' category: #'Elevator-Ejercicio'!
+ElevatorWorkingState class
+	instanceVariableNames: ''!
+
+!ElevatorWorkingState class methodsFor: 'instance creation' stamp: 'FB 10/2/2017 21:00:43'!
+for: aBoolean
+
+	^self basicNew initialize: aBoolean.! !
+
+!ElevatorWorkingState class methodsFor: 'instance creation' stamp: 'FB 10/2/2017 21:00:56'!
+new
+
+	^self for: false.! !

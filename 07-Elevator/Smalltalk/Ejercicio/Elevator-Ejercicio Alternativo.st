@@ -13,6 +13,17 @@ ElevatorEmergency subclass: #ElevatorCabinEmergency
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
 
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ElevatorCabinEmergency class' category: #'Elevator-Ejercicio'!
+ElevatorCabinEmergency class
+	instanceVariableNames: ''!
+
+!ElevatorCabinEmergency class methodsFor: 'error description' stamp: 'FB 10/10/2017 10:02:21'!
+messageText
+
+	^'Sensor de cabina desincronizado'.! !
+
 
 !classDefinition: #ElevatorTest category: #'Elevator-Ejercicio'!
 TestCase subclass: #ElevatorTest
@@ -458,12 +469,10 @@ initialize
 	currentFloor _ 0.! !
 
 
-!Cabin methodsFor: 'cabin control' stamp: 'FB 10/5/2017 16:48:54'!
+!Cabin methodsFor: 'cabin control' stamp: 'FB 10/10/2017 09:50:05'!
 cabinOnFloor: aFloorNumber
 	
 	state cabin: self onFloor: aFloorNumber.
-	currentFloor _ aFloorNumber.
-	nextFloorToGo = currentFloor ifTrue: [ state _ CabinStoppedState new. cabinDoor open ].
 	! !
 
 !Cabin methodsFor: 'cabin control' stamp: 'FB 10/5/2017 16:49:51'!
@@ -951,6 +960,12 @@ openDoorFor: aCabin
 
 	aCabin openDoorWhenMoving.! !
 
+
+!CabinMovingState methodsFor: 'cabin control' stamp: 'FB 10/10/2017 09:49:22'!
+cabin: aCabin onFloor: aFloorNumber
+
+	aCabin cabinWhenMovingOnFloor: aFloorNumber.! !
+
 
 !classDefinition: #CabinStoppedState category: #'Elevator-Ejercicio'!
 CabinState subclass: #CabinStoppedState
@@ -979,6 +994,12 @@ closeDoorFor: aCabin
 openDoorFor: aCabin
 
 	aCabin openDoorWhenStopped.! !
+
+
+!CabinStoppedState methodsFor: 'cabin control' stamp: 'FB 10/10/2017 09:49:44'!
+cabin: aCabin onFloor: aFloorNumber
+
+	aCabin cabinWhenStoppedOnFloor: aFloorNumber.! !
 
 
 !classDefinition: #ElevatorController category: #'Elevator-Ejercicio'!
@@ -1214,7 +1235,6 @@ isIdle
 isWorking
 
 	^true.! !
-
 
 
 !ElevatorWorkingState methodsFor: 'elevator control' stamp: 'FB 10/5/2017 16:06:31'!

@@ -568,26 +568,30 @@ waitForPeople
 ! !
 
 
-!Cabin methodsFor: 'state change' stamp: 'CM 10/12/2017 20:59:30'!
+!Cabin methodsFor: 'state change' stamp: 'CM 10/13/2017 03:28:47'!
+logAndChangeCabinStateTo: aCabinStateClass 	
+
+	Elevator acaSeHizoAlgo.
+	state _ aCabinStateClass for: self.
+	elevator viewers logCabinAction.! !
+
+!Cabin methodsFor: 'state change' stamp: 'CM 10/13/2017 03:30:07'!
 makeMoving
 	
 	Elevator acaSeHizoAlgo.
-	state := CabinMovingState for: self.
-	elevator viewers logCabinAction.! !
+	self logAndChangeCabinStateTo: CabinMovingState.	! !
 
-!Cabin methodsFor: 'state change' stamp: 'CM 10/12/2017 20:59:40'!
+!Cabin methodsFor: 'state change' stamp: 'CM 10/13/2017 03:30:20'!
 makeStopped
 
 	Elevator acaSeHizoAlgo.
-	state := CabinStoppedState for: self.
-	elevator viewers logCabinAction.! !
+	self logAndChangeCabinStateTo: CabinStoppedState.! !
 
-!Cabin methodsFor: 'state change' stamp: 'CM 10/12/2017 21:07:08'!
+!Cabin methodsFor: 'state change' stamp: 'CM 10/13/2017 03:30:32'!
 makeWaitingForPeople
 	
 	Elevator acaSeHizoAlgo.
-	state := CabinWaitingForPeopleState for: self.
-	elevator viewers logCabinAction.! !
+	self logAndChangeCabinStateTo: CabinWaitingForPeopleState.! !
 
 
 !Cabin methodsFor: 'sensor activation' stamp: 'HAW 10/3/2017 16:47:02'!
@@ -886,33 +890,35 @@ isMotorStopped
 	^motor isStopped! !
 
 
-!CabinDoor methodsFor: 'state change' stamp: 'CM 10/12/2017 20:52:44'!
+!CabinDoor methodsFor: 'state change' stamp: 'CM 10/13/2017 03:26:44'!
+logAndChangeDoorStateTo: aCabinDoorStateClass 	
+	Elevator acaSeHizoAlgo.
+	state _ aCabinDoorStateClass for: self.
+	cabin logDoorAction.! !
+
+!CabinDoor methodsFor: 'state change' stamp: 'CM 10/13/2017 03:26:52'!
 makeClosed
 		
 	Elevator acaSeHizoAlgo.
-	state := CabinDoorClosedState for: self.
-	cabin logDoorAction.! !
+	self logAndChangeDoorStateTo: CabinDoorClosedState.! !
 
-!CabinDoor methodsFor: 'state change' stamp: 'CM 10/12/2017 20:53:05'!
+!CabinDoor methodsFor: 'state change' stamp: 'CM 10/13/2017 03:26:59'!
 makeClosing
 	
 	Elevator acaSeHizoAlgo.
-	state := CabinDoorClosingState for: self.
-	cabin logDoorAction.! !
+	self logAndChangeDoorStateTo: CabinDoorClosingState.! !
 
-!CabinDoor methodsFor: 'state change' stamp: 'CM 10/12/2017 21:06:27'!
+!CabinDoor methodsFor: 'state change' stamp: 'CM 10/13/2017 03:27:05'!
 makeOpened
 	
 	Elevator acaSeHizoAlgo.
-	state := CabinDoorOpenedState for: self.
-	cabin logDoorAction.! !
+	self logAndChangeDoorStateTo: CabinDoorOpenedState.! !
 
-!CabinDoor methodsFor: 'state change' stamp: 'CM 10/12/2017 21:21:27'!
+!CabinDoor methodsFor: 'state change' stamp: 'CM 10/13/2017 03:27:11'!
 makeOpening
 		
 	Elevator acaSeHizoAlgo.
-	state := CabinDoorOpeningState for: self.
-	cabin logDoorAction.! !
+	self logAndChangeDoorStateTo: CabinDoorOpeningState.! !
 
 
 !CabinDoor methodsFor: 'exceptions' stamp: 'HAW 10/3/2017 20:08:30'!
@@ -1449,7 +1455,6 @@ isWorking
 cabin
 	
 	^cabin! !
-
 
 
 !Elevator methodsFor: 'viewers' stamp: 'CM 10/12/2017 20:47:26'!

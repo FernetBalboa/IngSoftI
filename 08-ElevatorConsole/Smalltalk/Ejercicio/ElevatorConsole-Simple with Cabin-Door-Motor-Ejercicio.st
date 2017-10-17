@@ -538,20 +538,21 @@ setUp
 
 !classDefinition: #Cabin category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 Object subclass: #Cabin
-	instanceVariableNames: 'elevator state door motor currentFloorNumber'
+	instanceVariableNames: 'elevator state door motor currentFloorNumber viewer'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!Cabin methodsFor: 'initialization' stamp: 'HAW 10/4/2017 14:14:26'!
+!Cabin methodsFor: 'initialization' stamp: 'CM 10/17/2017 18:52:05'!
 initializeOf: anElevator
 
+	Elevator acaSeHizoAlgo.
 	elevator := anElevator.
 	door := CabinDoor of: self.
 	motor := Motor new.
 	currentFloorNumber := 0.
-	state := CabinStoppedState for: self
-	! !
+	state := CabinStoppedState for: self.
+	viewer _ CabinViewer for: self.! !
 
 
 !Cabin methodsFor: 'actions' stamp: 'HAW 10/3/2017 16:48:24'!
@@ -567,13 +568,6 @@ waitForPeople
 	self makeWaitingForPeople
 ! !
 
-
-!Cabin methodsFor: 'state change' stamp: 'CM 10/13/2017 03:28:47'!
-logAndChangeCabinStateTo: aCabinStateClass 	
-
-	Elevator acaSeHizoAlgo.
-	state _ aCabinStateClass for: self.
-	elevator viewers logCabinAction.! !
 
 !Cabin methodsFor: 'state change' stamp: 'CM 10/13/2017 03:30:07'!
 makeMoving
@@ -719,11 +713,24 @@ door
 	^door! !
 
 
-!Cabin methodsFor: 'actionLog' stamp: 'CM 10/12/2017 20:55:33'!
+!Cabin methodsFor: 'viewers' stamp: 'CM 10/17/2017 18:41:08'!
+addViewer: aViewer
+
+	Elevator acaSeHizoAlgo.
+	viewer add: aViewer.! !
+
+!Cabin methodsFor: 'viewers' stamp: 'CM 10/17/2017 18:44:35'!
+logAndChangeCabinStateTo: aCabinStateClass 	
+
+	Elevator acaSeHizoAlgo.
+	state _ aCabinStateClass for: self.
+	viewer logCabinAction.! !
+
+!Cabin methodsFor: 'viewers' stamp: 'CM 10/17/2017 18:45:29'!
 logDoorAction
 	
 	Elevator acaSeHizoAlgo.
-	^elevator viewers logDoorAction.! !
+	viewer logDoorAction.! !
 
 
 !Cabin methodsFor: 'state' stamp: 'CM 10/12/2017 21:05:48'!
@@ -890,12 +897,6 @@ isMotorStopped
 	^motor isStopped! !
 
 
-!CabinDoor methodsFor: 'state change' stamp: 'CM 10/13/2017 03:26:44'!
-logAndChangeDoorStateTo: aCabinDoorStateClass 	
-	Elevator acaSeHizoAlgo.
-	state _ aCabinDoorStateClass for: self.
-	cabin logDoorAction.! !
-
 !CabinDoor methodsFor: 'state change' stamp: 'CM 10/13/2017 03:26:52'!
 makeClosed
 		
@@ -937,6 +938,13 @@ state
 
 	Elevator acaSeHizoAlgo.
 	^ state.! !
+
+
+!CabinDoor methodsFor: 'viewers' stamp: 'CM 10/13/2017 03:26:44'!
+logAndChangeDoorStateTo: aCabinDoorStateClass 	
+	Elevator acaSeHizoAlgo.
+	state _ aCabinDoorStateClass for: self.
+	cabin logDoorAction.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1363,21 +1371,63 @@ accept: aVisitor
 	aVisitor visitCabinWaitingForPeople: self! !
 
 
-!classDefinition: #Elevator category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
-Object subclass: #Elevator
-	instanceVariableNames: 'cabin state floorsToGo viewer'
+!classDefinition: #CabinViewer category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
+Object subclass: #CabinViewer
+	instanceVariableNames: 'loggers cabin door'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!Elevator methodsFor: 'initialization' stamp: 'CM 10/12/2017 21:13:15'!
-initialize
+!CabinViewer methodsFor: 'as yet unclassified' stamp: 'CM 10/12/2017 20:47:48'!
+add: aViewer.
+
+	Elevator acaSeHizoAlgo.
+	loggers add: aViewer.! !
+
+!CabinViewer methodsFor: 'as yet unclassified' stamp: 'CM 10/17/2017 18:54:34'!
+initializeFor: aCabin
 	
 	Elevator acaSeHizoAlgo.
-	cabin := Cabin of: self.
-	floorsToGo := SortedCollection new.
-	state := ElevatorIdleState for: self.
-	viewer  _ ElevatorViewer for: self.! !
+	loggers _ OrderedCollection new.
+	cabin _ aCabin. 
+	door _ aCabin door.! !
+
+!CabinViewer methodsFor: 'as yet unclassified' stamp: 'CM 10/12/2017 21:04:14'!
+logCabinAction
+	
+	Elevator acaSeHizoAlgo.
+	loggers do: [:aLogger | cabin state accept: aLogger ]! !
+
+!CabinViewer methodsFor: 'as yet unclassified' stamp: 'CM 10/12/2017 21:08:40'!
+logDoorAction
+
+	Elevator acaSeHizoAlgo.
+	loggers do: [:aLogger | door state accept: aLogger ]! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'CabinViewer class' category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
+CabinViewer class
+	instanceVariableNames: ''!
+
+!CabinViewer class methodsFor: 'as yet unclassified' stamp: 'CM 10/17/2017 18:53:53'!
+for: aCabin
+
+	^self basicNew initializeFor: aCabin.! !
+
+
+!classDefinition: #Elevator category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
+Object subclass: #Elevator
+	instanceVariableNames: 'cabin state floorsToGo'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
+
+!Elevator methodsFor: 'initialization' stamp: 'CM 10/17/2017 18:51:23'!
+initialize
+	cabin _ Cabin of: self.
+	floorsToGo _ SortedCollection new.
+	state _ ElevatorIdleState for: self.! !
 
 
 !Elevator methodsFor: 'state change' stamp: 'HAW 10/3/2017 16:56:07'!
@@ -1456,19 +1506,6 @@ cabin
 	
 	^cabin! !
 
-
-!Elevator methodsFor: 'viewers' stamp: 'CM 10/12/2017 20:47:26'!
-addViewer: aViewer
-
-	Elevator acaSeHizoAlgo.
-	viewer add: aViewer.! !
-
-!Elevator methodsFor: 'viewers' stamp: 'CM 10/12/2017 20:46:33'!
-viewers
-	
-	Elevator acaSeHizoAlgo.
-	^viewer.! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Elevator class' category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
@@ -1486,12 +1523,12 @@ Object subclass: #ElevatorConsole
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!ElevatorConsole methodsFor: 'initialization' stamp: 'CM 10/12/2017 21:10:06'!
+!ElevatorConsole methodsFor: 'initialization' stamp: 'CM 10/17/2017 18:44:04'!
 initializeOf: anElevator
 	
 	Elevator acaSeHizoAlgo.
 	stream := WriteStream on: String new.
-	anElevator addViewer: self
+	anElevator cabin addViewer: self
 ! !
 
 
@@ -1653,11 +1690,11 @@ Object subclass: #ElevatorStatusView
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!ElevatorStatusView methodsFor: 'initialization' stamp: 'CM 10/12/2017 21:10:29'!
+!ElevatorStatusView methodsFor: 'initialization' stamp: 'CM 10/17/2017 18:44:11'!
 initializeOf: anElevator
 		
 	Elevator acaSeHizoAlgo.
-	anElevator addViewer: self
+	anElevator cabin addViewer: self
 ! !
 
 
@@ -1717,52 +1754,6 @@ ElevatorStatusView class
 of: anElevator
 
 	^ self new initializeOf: anElevator! !
-
-
-!classDefinition: #ElevatorViewer category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
-Object subclass: #ElevatorViewer
-	instanceVariableNames: 'loggers cabin door elevator'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
-
-!ElevatorViewer methodsFor: 'as yet unclassified' stamp: 'CM 10/12/2017 20:47:48'!
-add: aViewer.
-
-	Elevator acaSeHizoAlgo.
-	loggers add: aViewer.! !
-
-!ElevatorViewer methodsFor: 'as yet unclassified' stamp: 'CM 10/12/2017 20:44:27'!
-initializeFor: anElevator
-	
-	Elevator acaSeHizoAlgo.
-	loggers _ OrderedCollection new.
-	elevator _ anElevator. 
-	cabin _ anElevator cabin.
-	door _ anElevator cabin door.! !
-
-!ElevatorViewer methodsFor: 'as yet unclassified' stamp: 'CM 10/12/2017 21:04:14'!
-logCabinAction
-	
-	Elevator acaSeHizoAlgo.
-	loggers do: [:aLogger | cabin state accept: aLogger ]! !
-
-!ElevatorViewer methodsFor: 'as yet unclassified' stamp: 'CM 10/12/2017 21:08:40'!
-logDoorAction
-
-	Elevator acaSeHizoAlgo.
-	loggers do: [:aLogger | door state accept: aLogger ]! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'ElevatorViewer class' category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
-ElevatorViewer class
-	instanceVariableNames: ''!
-
-!ElevatorViewer class methodsFor: 'as yet unclassified' stamp: 'CM 10/12/2017 21:18:20'!
-for: anElevator
-
-	^self basicNew initializeFor: anElevator.! !
 
 
 !classDefinition: #Motor category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!

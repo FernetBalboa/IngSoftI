@@ -538,21 +538,21 @@ setUp
 
 !classDefinition: #Cabin category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 Object subclass: #Cabin
-	instanceVariableNames: 'elevator state door motor currentFloorNumber viewer'
+	instanceVariableNames: 'elevator state door motor currentFloorNumber log'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!Cabin methodsFor: 'initialization' stamp: 'CM 10/17/2017 18:52:05'!
+!Cabin methodsFor: 'initialization' stamp: 'FB 10/18/2017 11:31:01'!
 initializeOf: anElevator
 
-	Elevator acaSeHizoAlgo.
 	elevator := anElevator.
 	door := CabinDoor of: self.
 	motor := Motor new.
 	currentFloorNumber := 0.
 	state := CabinStoppedState for: self.
-	viewer _ CabinViewer for: self.! !
+	log := Log for: self.
+	! !
 
 
 !Cabin methodsFor: 'actions' stamp: 'HAW 10/3/2017 16:48:24'!
@@ -569,23 +569,32 @@ waitForPeople
 ! !
 
 
-!Cabin methodsFor: 'state change' stamp: 'CM 10/13/2017 03:30:07'!
+!Cabin methodsFor: 'logging' stamp: 'FB 10/18/2017 14:15:18'!
+log
+
+	^log.! !
+
+
+!Cabin methodsFor: 'state change' stamp: 'FB 10/18/2017 14:30:59'!
+logAndMake: aCabinState
+	
+	state _ aCabinState for: self.
+	state log.! !
+
+!Cabin methodsFor: 'state change' stamp: 'FB 10/18/2017 14:35:03'!
 makeMoving
 	
-	Elevator acaSeHizoAlgo.
-	self logAndChangeCabinStateTo: CabinMovingState.	! !
+	self logAndMake: CabinMovingState.! !
 
-!Cabin methodsFor: 'state change' stamp: 'CM 10/13/2017 03:30:20'!
+!Cabin methodsFor: 'state change' stamp: 'FB 10/18/2017 14:35:06'!
 makeStopped
+	
+	self logAndMake: CabinStoppedState.! !
 
-	Elevator acaSeHizoAlgo.
-	self logAndChangeCabinStateTo: CabinStoppedState.! !
-
-!Cabin methodsFor: 'state change' stamp: 'CM 10/13/2017 03:30:32'!
+!Cabin methodsFor: 'state change' stamp: 'FB 10/18/2017 14:35:11'!
 makeWaitingForPeople
 	
-	Elevator acaSeHizoAlgo.
-	self logAndChangeCabinStateTo: CabinWaitingForPeopleState.! !
+	self logAndMake: CabinWaitingForPeopleState.! !
 
 
 !Cabin methodsFor: 'sensor activation' stamp: 'HAW 10/3/2017 16:47:02'!
@@ -712,33 +721,6 @@ door
 
 	^door! !
 
-
-!Cabin methodsFor: 'viewers' stamp: 'CM 10/17/2017 18:41:08'!
-addViewer: aViewer
-
-	Elevator acaSeHizoAlgo.
-	viewer add: aViewer.! !
-
-!Cabin methodsFor: 'viewers' stamp: 'CM 10/17/2017 18:44:35'!
-logAndChangeCabinStateTo: aCabinStateClass 	
-
-	Elevator acaSeHizoAlgo.
-	state _ aCabinStateClass for: self.
-	viewer logCabinAction.! !
-
-!Cabin methodsFor: 'viewers' stamp: 'CM 10/17/2017 18:45:29'!
-logDoorAction
-	
-	Elevator acaSeHizoAlgo.
-	viewer logDoorAction.! !
-
-
-!Cabin methodsFor: 'state' stamp: 'CM 10/12/2017 21:05:48'!
-state
-
-	Elevator acaSeHizoAlgo.
-	^state ! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Cabin class' category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
@@ -759,17 +741,18 @@ sensorDesincronizedErrorMessage
 
 !classDefinition: #CabinDoor category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 Object subclass: #CabinDoor
-	instanceVariableNames: 'cabin state motor'
+	instanceVariableNames: 'cabin state motor log'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!CabinDoor methodsFor: 'initialization' stamp: 'HAW 10/4/2017 14:14:32'!
+!CabinDoor methodsFor: 'initialization' stamp: 'FB 10/18/2017 11:31:15'!
 initializeOf: aCabin
 
 	cabin := aCabin.
 	motor := Motor new.
-	state :=CabinDoorOpenedState for: self! !
+	state :=CabinDoorOpenedState for: self.
+	log := Log for: self.! !
 
 
 !CabinDoor methodsFor: 'actions' stamp: 'HAW 10/4/2017 10:21:35'!
@@ -897,29 +880,37 @@ isMotorStopped
 	^motor isStopped! !
 
 
-!CabinDoor methodsFor: 'state change' stamp: 'CM 10/13/2017 03:26:52'!
-makeClosed
-		
-	Elevator acaSeHizoAlgo.
-	self logAndChangeDoorStateTo: CabinDoorClosedState.! !
+!CabinDoor methodsFor: 'logging' stamp: 'FB 10/18/2017 14:15:43'!
+log
 
-!CabinDoor methodsFor: 'state change' stamp: 'CM 10/13/2017 03:26:59'!
+	^log.! !
+
+
+!CabinDoor methodsFor: 'state change' stamp: 'FB 10/18/2017 14:30:43'!
+logAndMake: aCabinDoorState
+	
+	state _ aCabinDoorState for: self.
+	state log.! !
+
+!CabinDoor methodsFor: 'state change' stamp: 'FB 10/18/2017 14:22:13'!
+makeClosed
+	
+	self logAndMake: CabinDoorClosedState.! !
+
+!CabinDoor methodsFor: 'state change' stamp: 'FB 10/18/2017 14:22:17'!
 makeClosing
 	
-	Elevator acaSeHizoAlgo.
-	self logAndChangeDoorStateTo: CabinDoorClosingState.! !
+	self logAndMake: CabinDoorClosingState.! !
 
-!CabinDoor methodsFor: 'state change' stamp: 'CM 10/13/2017 03:27:05'!
+!CabinDoor methodsFor: 'state change' stamp: 'FB 10/18/2017 14:22:19'!
 makeOpened
 	
-	Elevator acaSeHizoAlgo.
-	self logAndChangeDoorStateTo: CabinDoorOpenedState.! !
+	self logAndMake: CabinDoorOpenedState.! !
 
-!CabinDoor methodsFor: 'state change' stamp: 'CM 10/13/2017 03:27:11'!
+!CabinDoor methodsFor: 'state change' stamp: 'FB 10/18/2017 14:22:23'!
 makeOpening
-		
-	Elevator acaSeHizoAlgo.
-	self logAndChangeDoorStateTo: CabinDoorOpeningState.! !
+	
+	self logAndMake: CabinDoorOpeningState.! !
 
 
 !CabinDoor methodsFor: 'exceptions' stamp: 'HAW 10/3/2017 20:08:30'!
@@ -931,20 +922,6 @@ sensorDesincronizedErrorMessage
 signalSensorDesincronized
 	
 	self error: self sensorDesincronizedErrorMessage! !
-
-
-!CabinDoor methodsFor: 'state' stamp: 'CM 10/12/2017 21:07:58'!
-state
-
-	Elevator acaSeHizoAlgo.
-	^ state.! !
-
-
-!CabinDoor methodsFor: 'viewers' stamp: 'CM 10/13/2017 03:26:44'!
-logAndChangeDoorStateTo: aCabinDoorStateClass 	
-	Elevator acaSeHizoAlgo.
-	state _ aCabinDoorStateClass for: self.
-	cabin logDoorAction.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -966,15 +943,16 @@ sensorDesincronizedErrorMessage
 
 !classDefinition: #CabinDoorState category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 Object subclass: #CabinDoorState
-	instanceVariableNames: 'door'
+	instanceVariableNames: 'door log'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!CabinDoorState methodsFor: 'initialization' stamp: 'HAW 10/3/2017 16:42:05'!
+!CabinDoorState methodsFor: 'initialization' stamp: 'FB 10/18/2017 14:18:05'!
 initializeFor: aCabinDoor
 
-	door := aCabinDoor ! !
+	door := aCabinDoor.
+	log := door log.! !
 
 
 !CabinDoorState methodsFor: 'sensor activation' stamp: 'HAW 10/3/2017 20:25:19'!
@@ -1014,6 +992,12 @@ open
 accept: aVisitor
 
 	self subclassResponsibility ! !
+
+
+!CabinDoorState methodsFor: 'logging' stamp: 'FB 10/18/2017 14:20:02'!
+log
+
+	log logStateChange: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1213,15 +1197,16 @@ accept: aVisitor
 
 !classDefinition: #CabinState category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 Object subclass: #CabinState
-	instanceVariableNames: 'cabin'
+	instanceVariableNames: 'cabin log'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!CabinState methodsFor: 'initialization' stamp: 'HAW 10/3/2017 15:53:27'!
+!CabinState methodsFor: 'initialization' stamp: 'FB 10/18/2017 14:26:29'!
 initializeFor: aCabin
 
-	cabin := aCabin ! !
+	cabin := aCabin.
+	log := cabin log.! !
 
 
 !CabinState methodsFor: 'testing' stamp: 'HAW 10/3/2017 20:28:43'!
@@ -1253,6 +1238,12 @@ closeDoor
 accept: aVisitor
 
 	self subclassResponsibility ! !
+
+
+!CabinState methodsFor: 'logging' stamp: 'FB 10/18/2017 14:26:09'!
+log
+
+	log logStateChange: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1371,74 +1362,36 @@ accept: aVisitor
 	aVisitor visitCabinWaitingForPeople: self! !
 
 
-!classDefinition: #CabinViewer category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
-Object subclass: #CabinViewer
-	instanceVariableNames: 'loggers cabin door'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
-
-!CabinViewer methodsFor: 'as yet unclassified' stamp: 'CM 10/12/2017 20:47:48'!
-add: aViewer.
-
-	Elevator acaSeHizoAlgo.
-	loggers add: aViewer.! !
-
-!CabinViewer methodsFor: 'as yet unclassified' stamp: 'CM 10/17/2017 18:54:34'!
-initializeFor: aCabin
-	
-	Elevator acaSeHizoAlgo.
-	loggers _ OrderedCollection new.
-	cabin _ aCabin. 
-	door _ aCabin door.! !
-
-!CabinViewer methodsFor: 'as yet unclassified' stamp: 'CM 10/12/2017 21:04:14'!
-logCabinAction
-	
-	Elevator acaSeHizoAlgo.
-	loggers do: [:aLogger | cabin state accept: aLogger ]! !
-
-!CabinViewer methodsFor: 'as yet unclassified' stamp: 'CM 10/12/2017 21:08:40'!
-logDoorAction
-
-	Elevator acaSeHizoAlgo.
-	loggers do: [:aLogger | door state accept: aLogger ]! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'CabinViewer class' category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
-CabinViewer class
-	instanceVariableNames: ''!
-
-!CabinViewer class methodsFor: 'as yet unclassified' stamp: 'CM 10/17/2017 18:53:53'!
-for: aCabin
-
-	^self basicNew initializeFor: aCabin.! !
-
-
 !classDefinition: #Elevator category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 Object subclass: #Elevator
-	instanceVariableNames: 'cabin state floorsToGo'
+	instanceVariableNames: 'cabin state floorsToGo log'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!Elevator methodsFor: 'initialization' stamp: 'CM 10/17/2017 18:51:23'!
+!Elevator methodsFor: 'initialization' stamp: 'FB 10/18/2017 11:30:30'!
 initialize
-	cabin _ Cabin of: self.
-	floorsToGo _ SortedCollection new.
-	state _ ElevatorIdleState for: self.! !
+
+	cabin := Cabin of: self.
+	floorsToGo := SortedCollection new.
+	state := ElevatorIdleState for: self.
+	log := Log for: self.
+	! !
 
 
-!Elevator methodsFor: 'state change' stamp: 'HAW 10/3/2017 16:56:07'!
+!Elevator methodsFor: 'state change' stamp: 'FB 10/18/2017 11:03:25'!
 makeIdle
 	
-	state := ElevatorIdleState for: self! !
-
-!Elevator methodsFor: 'state change' stamp: 'HAW 10/3/2017 16:12:35'!
-makeWorking
+	"No es necesario loggear este cambio de estado"
 	
-	state := ElevatorWorkingState for: self! !
+	state := ElevatorIdleState for: self.! !
+
+!Elevator methodsFor: 'state change' stamp: 'FB 10/18/2017 11:03:37'!
+makeWorking
+		
+	"No es necesario loggear este cambio de estado"
+	
+	state := ElevatorWorkingState for: self.! !
 
 
 !Elevator methodsFor: 'actions' stamp: 'HAW 10/3/2017 16:07:55'!
@@ -1506,14 +1459,28 @@ cabin
 	
 	^cabin! !
 
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Elevator class' category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
-Elevator class
-	instanceVariableNames: ''!
+!Elevator methodsFor: 'logging' stamp: 'FB 10/18/2017 14:16:02'!
+addCabinDoorObserver: aCabinDoorObserver
 
-!Elevator class methodsFor: 'as yet unclassified' stamp: 'CM 10/12/2017 19:17:30'!
-acaSeHizoAlgo! !
+	cabin door log addObserver: aCabinDoorObserver.! !
+
+!Elevator methodsFor: 'logging' stamp: 'FB 10/18/2017 14:15:56'!
+addCabinObserver: aCabinObserver
+
+	cabin log addObserver: aCabinObserver.! !
+
+!Elevator methodsFor: 'logging' stamp: 'FB 10/18/2017 11:43:21'!
+addObserver: anElevatorObserver
+	
+	"En estos tests no se usa, pero podria desearse ver los estados del elevador en el futuro"
+	
+	log addObserver: anElevatorObserver.! !
+
+!Elevator methodsFor: 'logging' stamp: 'FB 10/18/2017 14:32:37'!
+log
+
+	^log.! !
 
 
 !classDefinition: #ElevatorConsole category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
@@ -1523,12 +1490,12 @@ Object subclass: #ElevatorConsole
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!ElevatorConsole methodsFor: 'initialization' stamp: 'CM 10/17/2017 18:44:04'!
+!ElevatorConsole methodsFor: 'initialization' stamp: 'FB 10/18/2017 11:31:59'!
 initializeOf: anElevator
 	
-	Elevator acaSeHizoAlgo.
 	stream := WriteStream on: String new.
-	anElevator cabin addViewer: self
+	anElevator addCabinObserver: self.
+	anElevator addCabinDoorObserver: self.
 ! !
 
 
@@ -1596,15 +1563,16 @@ of: anElevator
 
 !classDefinition: #ElevatorState category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 Object subclass: #ElevatorState
-	instanceVariableNames: 'elevator'
+	instanceVariableNames: 'elevator log'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!ElevatorState methodsFor: 'initialization' stamp: 'HAW 10/3/2017 15:52:01'!
+!ElevatorState methodsFor: 'initialization' stamp: 'FB 10/18/2017 14:31:56'!
 initializeFor: anElevator
 
-	elevator := anElevator ! !
+	elevator := anElevator.
+	log := elevator log.! !
 
 
 !ElevatorState methodsFor: 'actions' stamp: 'HAW 10/3/2017 20:22:29'!
@@ -1622,6 +1590,12 @@ isIdle
 isWorking
 
 	self subclassResponsibility ! !
+
+
+!ElevatorState methodsFor: 'logging' stamp: 'FB 10/18/2017 14:31:44'!
+log
+
+	log logStateChange: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1690,11 +1664,11 @@ Object subclass: #ElevatorStatusView
 	poolDictionaries: ''
 	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
 
-!ElevatorStatusView methodsFor: 'initialization' stamp: 'CM 10/17/2017 18:44:11'!
+!ElevatorStatusView methodsFor: 'initialization' stamp: 'FB 10/18/2017 11:40:14'!
 initializeOf: anElevator
-		
-	Elevator acaSeHizoAlgo.
-	anElevator cabin addViewer: self
+
+	anElevator addCabinObserver: self.
+	anElevator addCabinDoorObserver: self.
 ! !
 
 
@@ -1754,6 +1728,45 @@ ElevatorStatusView class
 of: anElevator
 
 	^ self new initializeOf: anElevator! !
+
+
+!classDefinition: #Log category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
+Object subclass: #Log
+	instanceVariableNames: 'observed statesLog observers'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
+
+!Log methodsFor: 'logging' stamp: 'FB 10/18/2017 14:29:43'!
+logStateChange: aState
+	
+	statesLog addLast: aState. "Para pasar los tests esto no es necesario en realidad. Solo se necesita actualizar los observers."
+	observers do: [:anObserver | aState accept: anObserver.]! !
+
+
+!Log methodsFor: 'observers' stamp: 'FB 10/18/2017 11:23:27'!
+addObserver: anObserver
+
+	observers add: anObserver.! !
+
+
+!Log methodsFor: 'initialization' stamp: 'FB 10/18/2017 11:29:48'!
+initializeFor: observedObject
+
+	observed  _ observedObject.
+	statesLog _ OrderedCollection new.
+	observers _ OrderedCollection new.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Log class' category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!
+Log class
+	instanceVariableNames: ''!
+
+!Log class methodsFor: 'instance creation' stamp: 'FB 10/18/2017 11:39:36'!
+for: anObservedObject
+
+	^self basicNew initializeFor: anObservedObject.! !
 
 
 !classDefinition: #Motor category: #'ElevatorConsole-Simple with Cabin-Door-Motor-Ejercicio'!

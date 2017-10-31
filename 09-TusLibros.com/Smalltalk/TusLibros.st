@@ -1,25 +1,25 @@
-!classDefinition: #CartTest category: #TusLibros!
-TestCase subclass: #CartTest
+!classDefinition: #TusLibrosTest category: #TusLibros!
+TestCase subclass: #TusLibrosTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CartTest methodsFor: 'items' stamp: 'FB 10/27/2017 10:57:56'!
+!TusLibrosTest methodsFor: 'items' stamp: 'FB 10/30/2017 19:03:09'!
 item1SoldByStore
-	^ 'Item1 sold by store'.! !
+	^ 'Item 1 sold by store'.! !
 
-!CartTest methodsFor: 'items' stamp: 'FB 10/27/2017 10:58:01'!
+!TusLibrosTest methodsFor: 'items' stamp: 'FB 10/30/2017 19:03:15'!
 item2SoldByStore
-	^ 'Item2 sold by store'.! !
+	^ 'Item 2 sold by store'.! !
 
-!CartTest methodsFor: 'items' stamp: 'FB 10/26/2017 21:43:18'!
+!TusLibrosTest methodsFor: 'items' stamp: 'FB 10/26/2017 21:43:18'!
 itemNotSoldByStore
 
 	^'Item not sold by store'.! !
 
 
-!CartTest methodsFor: 'testing' stamp: 'FB 10/26/2017 21:23:33'!
+!TusLibrosTest methodsFor: 'cart test' stamp: 'FB 10/26/2017 21:23:33'!
 test01NewCartIsEmpty
 
 	| cart |
@@ -28,7 +28,7 @@ test01NewCartIsEmpty
 	
 	self assert: cart isEmpty.! !
 
-!CartTest methodsFor: 'testing' stamp: 'FB 10/27/2017 10:54:30'!
+!TusLibrosTest methodsFor: 'cart test' stamp: 'FB 10/27/2017 10:54:30'!
 test02CanNotAddItemsThatDoNotBelongToStore
 
 	| cart |
@@ -43,14 +43,14 @@ test02CanNotAddItemsThatDoNotBelongToStore
 			self assert: cart isEmpty.].
 		! !
 
-!CartTest methodsFor: 'testing' stamp: 'FB 10/27/2017 10:57:45'!
+!TusLibrosTest methodsFor: 'cart test' stamp: 'FB 10/27/2017 10:57:45'!
 test03CartIsNotEmptyAfterAddingAnItem
 	| cart |
 	cart _ self createCart.
 	cart add: self item1SoldByStore.
 	self assert: cart isEmpty not.! !
 
-!CartTest methodsFor: 'testing' stamp: 'FB 10/27/2017 11:00:04'!
+!TusLibrosTest methodsFor: 'cart test' stamp: 'FB 10/27/2017 11:00:04'!
 test04CartCanHaveMoreThanOneElement
 
 	| cart item1 item2 |
@@ -66,7 +66,7 @@ test04CartCanHaveMoreThanOneElement
 	self assert: (cart includes: item1).
 	self assert: (cart includes: item2).! !
 
-!CartTest methodsFor: 'testing' stamp: 'FB 10/27/2017 11:02:32'!
+!TusLibrosTest methodsFor: 'cart test' stamp: 'FB 10/27/2017 11:02:32'!
 test05CartCanAddSameItemMoreThanOnce
 
 	| cart item |
@@ -80,7 +80,7 @@ test05CartCanAddSameItemMoreThanOnce
 	self assert: cart isEmpty not.
 	self assert: (cart occurrencesOf: item) equals: 2.! !
 
-!CartTest methodsFor: 'testing' stamp: 'FB 10/27/2017 11:04:34'!
+!TusLibrosTest methodsFor: 'cart test' stamp: 'FB 10/27/2017 11:04:34'!
 test06CartCanAddManyOfTheSameItemAtOnce
 
 	| cart item |
@@ -94,7 +94,7 @@ test06CartCanAddManyOfTheSameItemAtOnce
 	self assert: cart isEmpty not.
 	self assert: (cart occurrencesOf: item) equals: 5.! !
 
-!CartTest methodsFor: 'testing' stamp: 'FB 10/27/2017 11:13:53'!
+!TusLibrosTest methodsFor: 'cart test' stamp: 'FB 10/27/2017 11:13:53'!
 test07RemovingAUnitOfAnItemDecreasesItsOcurrencesByOne
 	
 	| cart item1 |
@@ -110,7 +110,7 @@ test07RemovingAUnitOfAnItemDecreasesItsOcurrencesByOne
 		assert: (cart occurrencesOf: item1)
 		equals: 1.! !
 
-!CartTest methodsFor: 'testing' stamp: 'FB 10/27/2017 11:13:59'!
+!TusLibrosTest methodsFor: 'cart test' stamp: 'FB 10/27/2017 11:13:59'!
 test08CartDoesNotIncludeItemAfterRemovingAllItsOcurrences
 	
 	| cart item1 item2 |
@@ -130,7 +130,7 @@ test08CartDoesNotIncludeItemAfterRemovingAllItsOcurrences
 	self assert: (cart includes: item1) not.
 	self assert: (cart includes: item2).! !
 
-!CartTest methodsFor: 'testing' stamp: 'FB 10/27/2017 11:14:04'!
+!TusLibrosTest methodsFor: 'cart test' stamp: 'FB 10/27/2017 11:14:04'!
 test09CanNotRemoveAnItemFromCartThatWasNotAdded
 
 	| cart item1 item2 |
@@ -152,135 +152,70 @@ test09CanNotRemoveAnItemFromCartThatWasNotAdded
 	! !
 
 
-!CartTest methodsFor: 'cart creation' stamp: 'FB 10/27/2017 10:52:20'!
+!TusLibrosTest methodsFor: 'cart creation' stamp: 'FB 10/30/2017 19:04:05'!
 createCart
 	^ Cart withCatalogue: self defaultCatalogue.! !
 
-!CartTest methodsFor: 'cart creation' stamp: 'FB 10/27/2017 10:59:46'!
+!TusLibrosTest methodsFor: 'cart creation' stamp: 'FB 10/30/2017 21:02:50'!
+createSalesBook
+
+	^ Dictionary new.! !
+
+!TusLibrosTest methodsFor: 'cart creation' stamp: 'FB 10/30/2017 18:19:25'!
 defaultCatalogue
-	^ Set with: self item1SoldByStore with: self item2SoldByStore.! !
-
-
-!classDefinition: #CashierTest category: #TusLibros!
-TestCase subclass: #CashierTest
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'TusLibros'!
-
-!CashierTest methodsFor: 'testing' stamp: 'FB 10/28/2017 13:28:03'!
-test01CanNotCheckoutEmptyCart
-
-	| cart cashier card |
 	
-	cashier _ self createCashier.
-	cart _ cashier cart.
-	card _ self createValidCreditCard.
-	
+	| catalogue |
+	catalogue _ Dictionary new.
+	catalogue at: (self item1SoldByStore) put: 10 * peso.
+	catalogue at: (self item2SoldByStore) put: 30 * peso.
+	^catalogue.
+	! !
+
+
+!TusLibrosTest methodsFor: 'credit card test' stamp: 'FB 10/30/2017 18:59:51'!
+test10CanNotCreateCreditCardWithNameLongerThan30Characters
 	self
-		should: [ cashier checkout: cart withCreditCard: card ]
+		should: [ self createCreditCardWithInvalidName ]
 		raise: Error
 		withExceptionDo: [ :anError |
-			self assert: anError messageText = Cashier emptyCartCheckoutErrorMessage.
-			"Assert no payment was charged"]! !
+			self assert: anError messageText = CreditCard tooManyCharactersInOwnerNameErrorMessage ].! !
 
-!CashierTest methodsFor: 'testing' stamp: 'FB 10/28/2017 14:33:21'!
-test02CanNotCheckoutCartWithExpiredCreditCard
+!TusLibrosTest methodsFor: 'credit card test' stamp: 'FB 10/30/2017 19:00:03'!
+test11CreditCardNumberMustHave16Digits
+	"Esto solo testea que no falla con 15 digitos. Seria bueno testear que tampoco funcione con 17, asi cubrimos los casos borde"
+	self
+		should: [ self createCreditCardWithInvalidNumber ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = CreditCard invalidNumberErrorMessage ].! !
 
-	| cart cashier card |
-	
-	cashier _ self createCashier.
-	cart _ cashier cart.
-	cart add: self item1SoldByStore.
+!TusLibrosTest methodsFor: 'credit card test' stamp: 'FB 10/30/2017 19:00:20'!
+test12ExpiredCreditCardKnowsItHasExpired
+	"Buscar mejor nombre para el test"
+	| card |
 	card _ self createExpiredCreditCard.
-	
-	self
-		should: [ cashier checkout: cart withCreditCard: card ]
-		raise: Error
-		withExceptionDo: [ :anError |
-			self assert: anError messageText = Cashier expiredCardCheckoutErrorMessage.
-			"Assert no payment was charged"]! !
+	self assert: card isExpired.! !
 
 
-!CashierTest methodsFor: 'cashier creation' stamp: 'FB 10/28/2017 11:58:13'!
+!TusLibrosTest methodsFor: 'cashier creation' stamp: 'FB 10/28/2017 11:58:13'!
 createCashier
 
 	^Cashier for: self createCart.! !
 
 
-!CashierTest methodsFor: 'cart creation' stamp: 'FB 10/27/2017 11:22:51'!
-createCart
-
-	^CartTest new createCart.! !
-
-
-!CashierTest methodsFor: 'items' stamp: 'FB 10/28/2017 14:34:09'!
-item1SoldByStore
-
-	^CartTest new item1SoldByStore.! !
-
-
-!CashierTest methodsFor: 'credit card creation' stamp: 'FB 10/28/2017 13:20:12'!
-createExpiredCreditCard
-	
-	^CreditCardTest new createExpiredCreditCard.! !
-
-!CashierTest methodsFor: 'credit card creation' stamp: 'FB 10/28/2017 13:20:53'!
-createValidCreditCard
-	
-	^CreditCardTest new createValidCreditCard.! !
-
-
-!classDefinition: #CreditCardTest category: #TusLibros!
-TestCase subclass: #CreditCardTest
-	instanceVariableNames: 'owner number expirationMonth'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'TusLibros'!
-
-!CreditCardTest methodsFor: 'testing' stamp: 'FB 10/28/2017 13:14:55'!
-test01CanNotCreateCreditCardWithNameLongerThan30Characters
-
-	self
-		should: [ self createCreditCardWithInvalidName ]
-		raise: Error
-		withExceptionDo: [ :anError | self assert: anError messageText = CreditCard tooManyCharactersInOwnerNameErrorMessage ] ! !
-
-!CreditCardTest methodsFor: 'testing' stamp: 'FB 10/28/2017 13:25:32'!
-test02CreditCardNumberMustHave16Digits
-	
-	"Esto solo testea que no falla con 15 digitos. Seria bueno testear que tampoco funcione con 17, asi cubrimos los casos borde"
-	
-	self
-		should: [ self createCreditCardWithInvalidNumber ]
-		raise: Error
-		withExceptionDo: [ :anError | self assert: anError messageText = CreditCard invalidNumberErrorMessage ] ! !
-
-!CreditCardTest methodsFor: 'testing' stamp: 'FB 10/28/2017 13:34:43'!
-test03ExpiredCreditCardKnowsItHasExpired
-	
-	"Buscar mejor nombre para el test"
-	
-	| card |
-	
-	card _ self createExpiredCreditCard.
-	
-	self assert: card isExpired.! !
-
-
-!CreditCardTest methodsFor: 'credit card creation' stamp: 'FB 10/28/2017 13:18:27'!
+!TusLibrosTest methodsFor: 'credit card creation' stamp: 'FB 10/28/2017 13:18:27'!
 createCreditCardWithInvalidName
 	
 	"Preguntar si contamos los espacios en blanco como caracteres"
 	
 	^CreditCard withOwner: 'Name is too long to put in card' withNumber: '5400000000000001' withExpiration: Date tomorrow month.! !
 
-!CreditCardTest methodsFor: 'credit card creation' stamp: 'FB 10/28/2017 12:48:52'!
+!TusLibrosTest methodsFor: 'credit card creation' stamp: 'FB 10/28/2017 12:48:52'!
 createCreditCardWithInvalidNumber
 
 	^CreditCard withOwner: 'Juan Perez' withNumber: '540000000000000' withExpiration: Date tomorrow month.! !
 
-!CreditCardTest methodsFor: 'credit card creation' stamp: 'FB 10/28/2017 13:40:54'!
+!TusLibrosTest methodsFor: 'credit card creation' stamp: 'FB 10/28/2017 13:40:54'!
 createExpiredCreditCard
 	
 	| today lastMonth |
@@ -290,10 +225,54 @@ createExpiredCreditCard
 	
 	^CreditCard withOwner: 'Juan Perez' withNumber: '5400000000000001' withExpiration: lastMonth.! !
 
-!CreditCardTest methodsFor: 'credit card creation' stamp: 'FB 10/28/2017 13:19:12'!
+!TusLibrosTest methodsFor: 'credit card creation' stamp: 'FB 10/28/2017 13:19:12'!
 createValidCreditCard
 
 	^CreditCard withOwner: 'Juan Perez' withNumber: '5400000000000001' withExpiration: Date tomorrow month.! !
+
+
+!TusLibrosTest methodsFor: 'cashier test' stamp: 'FB 10/30/2017 21:03:53'!
+test13CanNotCheckoutEmptyCart
+	| cashier card salesBook |
+	cashier _ self createCashier.
+	card _ self createValidCreditCard.
+	salesBook _ self createSalesBook.
+	
+	self
+		should: [ cashier checkoutWithCreditCard: card registerOn: salesBook .]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Cashier emptyCartCheckoutErrorMessage ].! !
+
+!TusLibrosTest methodsFor: 'cashier test' stamp: 'FB 10/30/2017 21:04:25'!
+test14CanNotCheckoutCartWithExpiredCreditCard
+	| cart cashier card salesBook |
+	cashier _ self createCashier.
+	cart _ cashier cart.
+	cart add: self item1SoldByStore.
+	card _ self createExpiredCreditCard.
+	salesBook _ self createSalesBook.
+	
+	self
+		should: [ cashier checkoutWithCreditCard: card registerOn: salesBook .]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Cashier expiredCardCheckoutErrorMessage ].! !
+
+!TusLibrosTest methodsFor: 'cashier test' stamp: 'FB 10/30/2017 21:16:22'!
+test15CashierCalculatesTheRightAmountToDebit
+	| cart cashier card salesBook |
+	cashier _ self createCashier.
+	cart _ cashier cart.
+	cart add: self item1SoldByStore.
+	cart add: self item1SoldByStore.
+	cart add: self item2SoldByStore.
+	cart add: self item2SoldByStore.
+	card _ self createValidCreditCard.
+	
+	salesBook _ self createSalesBook.
+		
+	self assert: (cashier checkoutWithCreditCard: card registerOn: salesBook) = (80 * peso).! !
 
 
 !classDefinition: #Cart category: #TusLibros!
@@ -303,17 +282,17 @@ Object subclass: #Cart
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Cart methodsFor: 'adding items' stamp: 'FB 10/27/2017 10:50:17'!
+!Cart methodsFor: 'adding items' stamp: 'FB 10/30/2017 18:21:19'!
 add: anItem
 	
-	(catalogue includes: anItem) ifFalse: [ ^self invalidItemErrorMessage ].
+	(catalogue includesKey: anItem) ifFalse: [ ^self invalidItemErrorMessage ].
 	items add: anItem.
 	! !
 
-!Cart methodsFor: 'adding items' stamp: 'FB 10/27/2017 11:05:32'!
+!Cart methodsFor: 'adding items' stamp: 'FB 10/30/2017 18:21:42'!
 add: quantity of: anItem
 	
-	(catalogue includes: anItem) ifFalse: [ ^self invalidItemErrorMessage ].
+	(catalogue includesKey: anItem) ifFalse: [ ^self invalidItemErrorMessage ].
 	items add: anItem withOccurrences: quantity.
 	! !
 
@@ -339,6 +318,11 @@ includes: anItem
 isEmpty
 
 	^items isEmpty.! !
+
+!Cart methodsFor: 'inspection' stamp: 'FB 10/30/2017 18:27:22'!
+items
+
+	^items.! !
 
 !Cart methodsFor: 'inspection' stamp: 'FB 10/27/2017 11:01:38'!
 occurrencesOf: anItem
@@ -392,11 +376,25 @@ Object subclass: #Cashier
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Cashier methodsFor: 'checkout' stamp: 'FB 10/28/2017 14:29:54'!
-checkout: aShoppingCart withCreditCard: aCreditCard
+!Cashier methodsFor: 'checkout' stamp: 'FB 10/30/2017 21:18:30'!
+checkoutWithCreditCard: aCreditCard registerOn: aSalesBook
 
-	aShoppingCart isEmpty ifTrue: [ ^Error signal: self class emptyCartCheckoutErrorMessage. ].
-	aCreditCard isExpired ifTrue: [ ^Error signal: self class expiredCardCheckoutErrorMessage. ].! !
+	| totalAmount |
+	cart isEmpty ifTrue: [ ^Error signal: self class emptyCartCheckoutErrorMessage. ].
+	aCreditCard isExpired ifTrue: [ ^Error signal: self class expiredCardCheckoutErrorMessage. ].
+	
+	totalAmount _ 0 * peso.
+	cart items do: [:anItem | totalAmount  _ self updateAmount: totalAmount andRegisterSaleOf: anItem on: aSalesBook].
+	self debit: totalAmount from: aCreditCard.
+	
+	^totalAmount.
+	! !
+
+!Cashier methodsFor: 'checkout' stamp: 'FB 10/30/2017 18:31:42'!
+debit: anAmountToDebit from: aCreditCard
+
+	
+	! !
 
 
 !Cashier methodsFor: 'initialization' stamp: 'FB 10/28/2017 11:57:11'!
@@ -415,6 +413,18 @@ cart
 catalogue
 
 	^catalogue.! !
+
+
+!Cashier methodsFor: 'as yet unclassified' stamp: 'FB 10/30/2017 20:59:02'!
+registerSaleOf: anItem on: aSalesBook 
+
+	aSalesBook at: anItem put: (catalogue at: anItem) ! !
+
+!Cashier methodsFor: 'as yet unclassified' stamp: 'FB 10/30/2017 21:18:01'!
+updateAmount: anAmount andRegisterSaleOf: anItem on: aSalesBook
+
+	aSalesBook at: anItem put: (catalogue at: anItem). 
+	^anAmount  + (catalogue at: anItem).	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 

@@ -172,29 +172,47 @@ defaultCatalogue
 	! !
 
 
-!TusLibrosTest methodsFor: 'credit card test' stamp: 'FB 10/30/2017 18:59:51'!
-test10CanNotCreateCreditCardWithNameLongerThan30Characters
+!TusLibrosTest methodsFor: 'credit card test' stamp: 'FB 10/31/2017 09:48:06'!
+test10CanNotCreateCreditCardWithEmptyName
+	
+	| register |
+	
+	register _ self createCreditCardsRegister.
+	
 	self
-		should: [ self createCreditCardWithInvalidName ]
+		should: [ register add: self createCreditCardWithEmptyName ]
 		raise: Error
 		withExceptionDo: [ :anError |
-			self assert: anError messageText = CreditCard tooManyCharactersInOwnerNameErrorMessage ].! !
+			self assert: anError messageText = CreditCard emptyOwnerNameErrorMessage.
+			self assert: register isEmpty ].! !
 
-!TusLibrosTest methodsFor: 'credit card test' stamp: 'FB 10/30/2017 19:00:03'!
+!TusLibrosTest methodsFor: 'credit card test' stamp: 'FB 10/31/2017 09:49:02'!
 test11CreditCardNumberMustHave16Digits
 	"Esto solo testea que no falla con 15 digitos. Seria bueno testear que tampoco funcione con 17, asi cubrimos los casos borde"
+	
+	| register |
+	
+	register _ self createCreditCardsRegister.
+	
 	self
-		should: [ self createCreditCardWithInvalidNumber ]
+		should: [ register add: self createCreditCardWithInvalidNumber ]
 		raise: Error
 		withExceptionDo: [ :anError |
-			self assert: anError messageText = CreditCard invalidNumberErrorMessage ].! !
+			self assert: anError messageText = CreditCard invalidNumberErrorMessage.
+			self assert: register isEmpty ].! !
 
-!TusLibrosTest methodsFor: 'credit card test' stamp: 'FB 10/30/2017 19:00:20'!
+!TusLibrosTest methodsFor: 'credit card test' stamp: 'FB 10/31/2017 09:50:19'!
 test12ExpiredCreditCardKnowsItHasExpired
 	"Buscar mejor nombre para el test"
-	| card |
+	| card register |
+	
+	register _ self createCreditCardsRegister.
 	card _ self createExpiredCreditCard.
-	self assert: card isExpired.! !
+	
+	register add: card.
+	
+	self assert: (card isExpiredAtDate: Date today).
+	self assert: (register includes: card).! !
 
 
 !TusLibrosTest methodsFor: 'cashier creation' stamp: 'FB 10/28/2017 11:58:13'!
@@ -203,10 +221,19 @@ createCashier
 	^Cashier for: self createCart.! !
 
 
-!TusLibrosTest methodsFor: 'credit card creation' stamp: 'FB 10/28/2017 13:18:27'!
+!TusLibrosTest methodsFor: 'credit card creation' stamp: 'FB 10/31/2017 09:30:38'!
+createCreditCardWithEmptyName
+	
+	"Preguntar si contamos los espacios en blanco como caracteres"
+	"Este metodo no corresponde aca, deberia moverse a la interfaz mas adelante"
+	
+	^CreditCard withOwner: ' ' withNumber: '5400000000000001' withExpiration: Date tomorrow month.! !
+
+!TusLibrosTest methodsFor: 'credit card creation' stamp: 'FB 10/31/2017 09:28:55'!
 createCreditCardWithInvalidName
 	
 	"Preguntar si contamos los espacios en blanco como caracteres"
+	"Este metodo no corresponde aca, deberia moverse a la interfaz mas adelante"
 	
 	^CreditCard withOwner: 'Name is too long to put in card' withNumber: '5400000000000001' withExpiration: Date tomorrow month.! !
 
@@ -215,13 +242,17 @@ createCreditCardWithInvalidNumber
 
 	^CreditCard withOwner: 'Juan Perez' withNumber: '540000000000000' withExpiration: Date tomorrow month.! !
 
-!TusLibrosTest methodsFor: 'credit card creation' stamp: 'FB 10/28/2017 13:40:54'!
+!TusLibrosTest methodsFor: 'credit card creation' stamp: 'FB 10/31/2017 09:46:59'!
+createCreditCardsRegister
+
+	^OrderedCollection new.! !
+
+!TusLibrosTest methodsFor: 'credit card creation' stamp: 'FB 10/31/2017 09:27:54'!
 createExpiredCreditCard
 	
-	| today lastMonth |
+	| lastMonth |
 	
-	today _ Date today.
-	lastMonth _ Month month: ((today monthIndex - 1)) year: today yearNumber. "Probablemente hay una forma mas facil de hacer esto"
+	lastMonth _ Date today month previous.
 	
 	^CreditCard withOwner: 'Juan Perez' withNumber: '5400000000000001' withExpiration: lastMonth.! !
 
@@ -376,12 +407,12 @@ Object subclass: #Cashier
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Cashier methodsFor: 'checkout' stamp: 'FB 10/30/2017 21:18:30'!
+!Cashier methodsFor: 'checkout' stamp: 'FB 10/31/2017 09:51:48'!
 checkoutWithCreditCard: aCreditCard registerOn: aSalesBook
 
 	| totalAmount |
 	cart isEmpty ifTrue: [ ^Error signal: self class emptyCartCheckoutErrorMessage. ].
-	aCreditCard isExpired ifTrue: [ ^Error signal: self class expiredCardCheckoutErrorMessage. ].
+	(aCreditCard isExpiredAtDate: Date today) ifTrue: [ ^Error signal: self class expiredCardCheckoutErrorMessage. ].
 	
 	totalAmount _ 0 * peso.
 	cart items do: [:anItem | totalAmount  _ self updateAmount: totalAmount andRegisterSaleOf: anItem on: aSalesBook].
@@ -464,10 +495,10 @@ initializeWithOwner: anOwnerName withNumber: aCreditCardNumber withExpiration: a
 	expirationMonthAndYear _ anExpirationMonthAndYear.! !
 
 
-!CreditCard methodsFor: 'status' stamp: 'FB 10/28/2017 14:27:58'!
-isExpired
+!CreditCard methodsFor: 'status' stamp: 'FB 10/31/2017 09:26:07'!
+isExpiredAtDate: aDate
 	
-	^(expirationMonthAndYear yearNumber < Month current yearNumber or: [ expirationMonthAndYear monthIndex < Month current monthIndex. ]).! !
+	^expirationMonthAndYear start < aDate month start.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -475,21 +506,25 @@ isExpired
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'instance creation' stamp: 'FB 10/28/2017 14:15:08'!
+!CreditCard class methodsFor: 'instance creation' stamp: 'FB 10/31/2017 09:43:51'!
 withOwner: anOwnerName withNumber: aCreditCardNumber withExpiration: anExpirationMonthAndYear
 	
-	anOwnerName size > 30 ifTrue: [ ^Error signal: self tooManyCharactersInOwnerNameErrorMessage ].
+	| letters |
+	
+	letters _ 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.
+	
+	(anOwnerName includesAnyOf: letters) ifFalse: [ ^Error signal: self emptyOwnerNameErrorMessage ].
 	aCreditCardNumber size ~= 16 ifTrue: [ ^Error signal: self invalidNumberErrorMessage ].
 	
 	^self basicNew initializeWithOwner: anOwnerName withNumber: aCreditCardNumber withExpiration: anExpirationMonthAndYear.! !
 
 
+!CreditCard class methodsFor: 'error messages' stamp: 'FB 10/31/2017 09:32:15'!
+emptyOwnerNameErrorMessage
+
+	^'Error: credit card owner name can not be empty'.! !
+
 !CreditCard class methodsFor: 'error messages' stamp: 'FB 10/28/2017 12:42:54'!
 invalidNumberErrorMessage
 
 	^'Error: credit card number must have 16 digits'.! !
-
-!CreditCard class methodsFor: 'error messages' stamp: 'FB 10/28/2017 12:42:07'!
-tooManyCharactersInOwnerNameErrorMessage
-
-	^'Error: credit card owner name must have at most 30 characters'.! !

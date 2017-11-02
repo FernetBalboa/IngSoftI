@@ -370,23 +370,73 @@ createMPSimulator
 	^ MerchantProcessorSimulator with: [true]! !
 
 
-!TusLibrosTest methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 17:31:15'!
+!TusLibrosTest methodsFor: 'Merchant Processor Simulator Exceptions' stamp: 'CM 11/2/2017 17:31:15'!
 insufficientFundsCreditCardException
 
 	^Error signal: MerchantProcessorSimulator insufficentFundsMessage 
 	! !
 
-!TusLibrosTest methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 17:47:19'!
+!TusLibrosTest methodsFor: 'Merchant Processor Simulator Exceptions' stamp: 'CM 11/2/2017 17:47:19'!
 invalidCreditCardException
 
 	^Error signal: MerchantProcessorSimulator invalidCreditCardMessage 
 	! !
 
-!TusLibrosTest methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 17:31:26'!
+!TusLibrosTest methodsFor: 'Merchant Processor Simulator Exceptions' stamp: 'CM 11/2/2017 17:31:26'!
 stolenCreditCardException
 
 	^Error signal: MerchantProcessorSimulator stolenCreditCardMessage 
 	! !
+
+
+!TusLibrosTest methodsFor: 'User Creation' stamp: 'FB 11/2/2017 19:59:57'!
+createUserWithInvalidID
+
+	^User id: 'BadID'  password: 'BuenoMuyBuenoPassword' ! !
+
+!TusLibrosTest methodsFor: 'User Creation' stamp: 'FB 11/2/2017 20:00:39'!
+createUserWithInvalidPassword.
+	
+	^User id: 'GoodID'  password: 'PasswordMaloMaloso' ! !
+
+!TusLibrosTest methodsFor: 'User Creation' stamp: 'FB 11/2/2017 20:47:07'!
+createValidUser
+	
+	^User id: 'user'  password: 'password' ! !
+
+
+!TusLibrosTest methodsFor: 'REST Inner Interface test' stamp: 'FB 11/2/2017 20:41:02'!
+test19CanNotCreateCartForInvalidUser
+
+	| interface invalidIdUser invalidPasswordUser userRegistry |
+	userRegistry _ OrderedCollection new.
+	interface _ RESTInnerInterface with: userRegistry.
+	invalidIdUser _  self createUserWithInvalidID.
+	invalidPasswordUser _  self createUserWithInvalidPassword.
+	self
+		should: [ interface createCartForAUser: invalidIdUser .]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = RESTInnerInterface invalidUserErrorMessage ].	
+
+	self
+		should: [ interface createCartForAUser: invalidPasswordUser ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = RESTInnerInterface invalidUserErrorMessage ].			! !
+
+!TusLibrosTest methodsFor: 'REST Inner Interface test' stamp: 'FB 11/2/2017 20:46:25'!
+test20CanCreateCartForValidUser
+
+	| interface idCart user userRegistry |
+	userRegistry _ OrderedCollection new.
+	user _ self createValidUser.
+	userRegistry add: user.
+	interface _ RESTInnerInterface with: userRegistry.
+	
+	idCart _ interface createCartForAUser: user.
+	
+	self assert: (interface listCart: idCart) isEmpty. ! !
 
 
 !classDefinition: #Cart category: #TusLibros!
@@ -505,6 +555,11 @@ checkoutWithCreditCard: aCreditCard registerOn: aSalesBook
 	^totalAmount.
 	! !
 
+!Cashier methodsFor: 'checkout' stamp: 'CM 11/2/2017 16:53:12'!
+recordSaleOn: aSalesBook
+
+	cart items do: [:anItem | aSalesBook at: anItem put: (catalogue at: anItem) ]! !
+
 
 !Cashier methodsFor: 'initialization' stamp: 'FB 10/28/2017 11:57:11'!
 initializeFor: aShoppingCart
@@ -530,22 +585,10 @@ catalogue
 
 	^catalogue.! !
 
-
-!Cashier methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 16:17:38'!
+!Cashier methodsFor: 'inspection' stamp: 'CM 11/2/2017 16:17:38'!
 merchantProcessor
 
 	^merchantProcessor ! !
-
-!Cashier methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 16:53:12'!
-recordSaleOn: aSalesBook
-
-	cart items do: [:anItem | aSalesBook at: anItem put: (catalogue at: anItem) ]! !
-
-!Cashier methodsFor: 'as yet unclassified' stamp: 'FB 10/30/2017 21:18:01'!
-updateAmount: anAmount andRegisterSaleOf: anItem on: aSalesBook
-
-	aSalesBook at: anItem put: (catalogue at: anItem). 
-	^anAmount  + (catalogue at: anItem).	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -632,20 +675,22 @@ Object subclass: #MerchantProcessorSimulator
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 16:24:28'!
-debit: aAmount from: aCreditCard
-
-	^ value value ! !
-
-!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 16:09:56'!
+!MerchantProcessorSimulator methodsFor: 'initialize' stamp: 'CM 11/2/2017 16:09:56'!
 initializeWith: aClousure
 
 	value  _ aClousure ! !
 
-!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 16:25:15'!
+
+!MerchantProcessorSimulator methodsFor: 'set' stamp: 'CM 11/2/2017 16:25:15'!
 simulateUsing: aClousure
 
 	value  _ aClousure ! !
+
+
+!MerchantProcessorSimulator methodsFor: 'process' stamp: 'CM 11/2/2017 16:24:28'!
+debit: aAmount from: aCreditCard
+
+	^ value value ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -672,3 +717,95 @@ stolenCreditCardMessage
 with: aClosure
 
 	^ self new initializeWith: aClosure .! !
+
+
+!classDefinition: #RESTInnerInterface category: #TusLibros!
+Object subclass: #RESTInnerInterface
+	instanceVariableNames: 'registeredUsers'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!RESTInnerInterface methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 20:14:10'!
+assertIsARegisteredUser: aUser.
+
+	(registeredUsers includes: aUser) ifFalse: [^self invalidUserError]  
+	
+	
+	
+	! !
+
+!RESTInnerInterface methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 20:10:47'!
+createCartForAUser: aUser
+
+	self assertIsARegisteredUser: aUser.
+	
+	
+	
+	! !
+
+!RESTInnerInterface methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 20:38:55'!
+initializeWith: aUserRegistry
+
+	registeredUsers _ aUserRegistry .! !
+
+!RESTInnerInterface methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 20:15:27'!
+invalidUserError
+
+	^ Error signal: RESTInnerInterface invalidUserErrorMessage
+	
+	
+	
+	! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'RESTInnerInterface class' category: #TusLibros!
+RESTInnerInterface class
+	instanceVariableNames: ''!
+
+!RESTInnerInterface class methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 20:16:10'!
+invalidUserErrorMessage
+	
+	^ 'Invalid User'! !
+
+!RESTInnerInterface class methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 20:40:05'!
+with: aUserRegistry
+
+	^self basicNew initializeWith: aUserRegistry ! !
+
+
+!classDefinition: #User category: #TusLibros!
+Object subclass: #User
+	instanceVariableNames: 'id password'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!User methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 19:54:00'!
+id
+
+	^id ! !
+
+!User methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 19:57:28'!
+intializeWithID: anId andPassword: aPassword 
+
+	id _ anId.
+	password _ aPassword.! !
+
+!User methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 19:54:10'!
+password
+
+	^password ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'User class' category: #TusLibros!
+User class
+	instanceVariableNames: ''!
+
+!User class methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 19:57:55'!
+id: anId password: aPassword
+
+	^self basicNew intializeWithID: anId andPassword: aPassword 
+	! !

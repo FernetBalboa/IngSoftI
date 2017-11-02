@@ -215,10 +215,10 @@ test12ExpiredCreditCardKnowsItHasExpired
 	self assert: (register includes: card).! !
 
 
-!TusLibrosTest methodsFor: 'cashier creation' stamp: 'FB 10/28/2017 11:58:13'!
+!TusLibrosTest methodsFor: 'cashier creation' stamp: 'CM 11/2/2017 16:18:33'!
 createCashier
 
-	^Cashier for: self createCart.! !
+	^Cashier with: self createCart with: self createMPSimulator.! !
 
 
 !TusLibrosTest methodsFor: 'credit card creation' stamp: 'FB 10/31/2017 09:30:38'!
@@ -256,6 +256,11 @@ createExpiredCreditCard
 	
 	^CreditCard withOwner: 'Juan Perez' withNumber: '5400000000000001' withExpiration: lastMonth.! !
 
+!TusLibrosTest methodsFor: 'credit card creation' stamp: 'CM 11/2/2017 16:32:47'!
+createStolenCreditCard
+
+	^CreditCard withOwner: 'arsene lupin' withNumber: '5400000000000001' withExpiration: Date tomorrow month.! !
+
 !TusLibrosTest methodsFor: 'credit card creation' stamp: 'FB 10/28/2017 13:19:12'!
 createValidCreditCard
 
@@ -290,7 +295,7 @@ test14CanNotCheckoutCartWithExpiredCreditCard
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = Cashier expiredCardCheckoutErrorMessage ].! !
 
-!TusLibrosTest methodsFor: 'cashier test' stamp: 'FB 10/30/2017 21:16:22'!
+!TusLibrosTest methodsFor: 'cashier test' stamp: 'CM 11/2/2017 17:35:29'!
 test15CashierCalculatesTheRightAmountToDebit
 	| cart cashier card salesBook |
 	cashier _ self createCashier.
@@ -300,10 +305,88 @@ test15CashierCalculatesTheRightAmountToDebit
 	cart add: self item2SoldByStore.
 	cart add: self item2SoldByStore.
 	card _ self createValidCreditCard.
-	
 	salesBook _ self createSalesBook.
 		
 	self assert: (cashier checkoutWithCreditCard: card registerOn: salesBook) = (80 * peso).! !
+
+!TusLibrosTest methodsFor: 'cashier test' stamp: 'CM 11/2/2017 17:29:38'!
+test16CanNotCheckoutWithStolenCreditCard
+
+	| cart cashier card salesBook |
+	cashier _ self createCashier.
+	cart _ cashier cart.
+	cart add: self item1SoldByStore.
+	card _ self createStolenCreditCard.
+	cashier merchantProcessor simulateUsing: [self stolenCreditCardException ].
+	salesBook _ self createSalesBook.
+	
+	self
+		should: [ cashier checkoutWithCreditCard: card registerOn: salesBook .]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = MerchantProcessorSimulator stolenCreditCardMessage ].
+	self assert: salesBook isEmpty.	! !
+
+!TusLibrosTest methodsFor: 'cashier test' stamp: 'CM 11/2/2017 17:30:47'!
+test17CanNotCheckoutWithInsufficientFunds
+
+	| cart cashier card salesBook |
+	cashier _ self createCashier.
+	cart _ cashier cart.
+	cart add: self item1SoldByStore.
+	card _ self createStolenCreditCard.
+	cashier merchantProcessor simulateUsing: [self insufficientFundsCreditCardException].
+	salesBook _ self createSalesBook.
+	
+	self
+		should: [ cashier checkoutWithCreditCard: card registerOn: salesBook .]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = MerchantProcessorSimulator insufficentFundsMessage ].
+	self assert: salesBook isEmpty.	! !
+
+!TusLibrosTest methodsFor: 'cashier test' stamp: 'CM 11/2/2017 17:39:10'!
+test18CanNotCheckoutWithInvalidCreditCard
+
+	| cart cashier card salesBook |
+	cashier _ self createCashier.
+	cart _ cashier cart.
+	cart add: self item1SoldByStore.
+	card _ self createValidCreditCard. "Valida como tarjeta, no existente en la BD del MP"
+	cashier merchantProcessor simulateUsing: [self invalidCreditCardException].
+	salesBook _ self createSalesBook.
+	
+	self
+		should: [ cashier checkoutWithCreditCard: card registerOn: salesBook .]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = MerchantProcessorSimulator invalidCreditCardMessage ].
+	self assert: salesBook isEmpty.	! !
+
+
+!TusLibrosTest methodsFor: 'MP creation' stamp: 'CM 11/2/2017 16:20:15'!
+createMPSimulator
+
+	^ MerchantProcessorSimulator with: [true]! !
+
+
+!TusLibrosTest methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 17:31:15'!
+insufficientFundsCreditCardException
+
+	^Error signal: MerchantProcessorSimulator insufficentFundsMessage 
+	! !
+
+!TusLibrosTest methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 17:47:19'!
+invalidCreditCardException
+
+	^Error signal: MerchantProcessorSimulator invalidCreditCardMessage 
+	! !
+
+!TusLibrosTest methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 17:31:26'!
+stolenCreditCardException
+
+	^Error signal: MerchantProcessorSimulator stolenCreditCardMessage 
+	! !
 
 
 !classDefinition: #Cart category: #TusLibros!
@@ -402,29 +485,24 @@ withCatalogue: aCatalogue
 
 !classDefinition: #Cashier category: #TusLibros!
 Object subclass: #Cashier
-	instanceVariableNames: 'cart catalogue'
+	instanceVariableNames: 'cart catalogue merchantProcessor'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Cashier methodsFor: 'checkout' stamp: 'FB 10/31/2017 09:51:48'!
-checkoutWithCreditCard: aCreditCard registerOn: aSalesBook
+!Cashier methodsFor: 'checkout' stamp: 'CM 11/2/2017 16:50:46'!
+checkoutWithCreditCard: aCreditCard registerOn: aSalesBook 
 
 	| totalAmount |
 	cart isEmpty ifTrue: [ ^Error signal: self class emptyCartCheckoutErrorMessage. ].
 	(aCreditCard isExpiredAtDate: Date today) ifTrue: [ ^Error signal: self class expiredCardCheckoutErrorMessage. ].
 	
-	totalAmount _ 0 * peso.
-	cart items do: [:anItem | totalAmount  _ self updateAmount: totalAmount andRegisterSaleOf: anItem on: aSalesBook].
-	self debit: totalAmount from: aCreditCard.
+	totalAmount _ cart items inject: 0 * peso into: 
+		[ :subTotal :anItem | subTotal + (catalogue at: anItem)].
+	merchantProcessor debit: totalAmount from: aCreditCard.
+	self recordSaleOn: aSalesBook. 
 	
 	^totalAmount.
-	! !
-
-!Cashier methodsFor: 'checkout' stamp: 'FB 10/30/2017 18:31:42'!
-debit: anAmountToDebit from: aCreditCard
-
-	
 	! !
 
 
@@ -433,6 +511,13 @@ initializeFor: aShoppingCart
 
 	cart _ aShoppingCart.
 	catalogue _ cart catalogue.! !
+
+!Cashier methodsFor: 'initialization' stamp: 'CM 11/2/2017 16:22:35'!
+initializeWith: aShoppingCart with: aMerchantProcessor
+
+	cart _ aShoppingCart.
+	catalogue _ cart catalogue.
+	merchantProcessor _ aMerchantProcessor .! !
 
 
 !Cashier methodsFor: 'inspection' stamp: 'FB 10/28/2017 11:59:30'!
@@ -446,10 +531,15 @@ catalogue
 	^catalogue.! !
 
 
-!Cashier methodsFor: 'as yet unclassified' stamp: 'FB 10/30/2017 20:59:02'!
-registerSaleOf: anItem on: aSalesBook 
+!Cashier methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 16:17:38'!
+merchantProcessor
 
-	aSalesBook at: anItem put: (catalogue at: anItem) ! !
+	^merchantProcessor ! !
+
+!Cashier methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 16:53:12'!
+recordSaleOn: aSalesBook
+
+	cart items do: [:anItem | aSalesBook at: anItem put: (catalogue at: anItem) ]! !
 
 !Cashier methodsFor: 'as yet unclassified' stamp: 'FB 10/30/2017 21:18:01'!
 updateAmount: anAmount andRegisterSaleOf: anItem on: aSalesBook
@@ -478,6 +568,11 @@ expiredCardCheckoutErrorMessage
 for: aShoppingCart
 
 	^self basicNew initializeFor: aShoppingCart.! !
+
+!Cashier class methodsFor: 'instance creation' stamp: 'CM 11/2/2017 16:21:43'!
+with: aShoppingCart with: aMerchantProcessor
+
+	^self basicNew initializeWith: aShoppingCart with: aMerchantProcessor .! !
 
 
 !classDefinition: #CreditCard category: #TusLibros!
@@ -528,3 +623,52 @@ emptyOwnerNameErrorMessage
 invalidNumberErrorMessage
 
 	^'Error: credit card number must have 16 digits'.! !
+
+
+!classDefinition: #MerchantProcessorSimulator category: #TusLibros!
+Object subclass: #MerchantProcessorSimulator
+	instanceVariableNames: 'value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 16:24:28'!
+debit: aAmount from: aCreditCard
+
+	^ value value ! !
+
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 16:09:56'!
+initializeWith: aClousure
+
+	value  _ aClousure ! !
+
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 16:25:15'!
+simulateUsing: aClousure
+
+	value  _ aClousure ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'MerchantProcessorSimulator class' category: #TusLibros!
+MerchantProcessorSimulator class
+	instanceVariableNames: ''!
+
+!MerchantProcessorSimulator class methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 17:25:43'!
+insufficentFundsMessage
+
+	^'Insufficent Funds'! !
+
+!MerchantProcessorSimulator class methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 17:40:08'!
+invalidCreditCardMessage
+
+	^'Invalid Credit Card'! !
+
+!MerchantProcessorSimulator class methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 17:24:42'!
+stolenCreditCardMessage
+
+	^'Stolen Credit Card'! !
+
+!MerchantProcessorSimulator class methodsFor: 'as yet unclassified' stamp: 'CM 11/2/2017 16:11:00'!
+with: aClosure
+
+	^ self new initializeWith: aClosure .! !

@@ -780,7 +780,6 @@ merchantProcessor
 Cashier class
 	instanceVariableNames: ''!
 
-
 !Cashier class methodsFor: 'instance creation' stamp: 'CM 11/2/2017 16:21:43'!
 with: aShoppingCart with: aMerchantProcessor
 
@@ -796,7 +795,6 @@ emptyCartCheckoutErrorMessage
 expiredCardCheckoutErrorMessage
 	
 	^'Error: can not checkout with expired credit card'.! !
-
 
 
 !classDefinition: #CreditCard category: #TusLibros!
@@ -1032,15 +1030,14 @@ salesOfUser: anUser
 	^salesBook at: anUser ! !
 
 
-!SystemInterface methodsFor: 'initialization' stamp: 'CM 11/6/2017 15:58:39'!
-initializeWithUsers: aUserRegistry products: aCatalogue recordingOn: aSalesBook debitingThrought: aMerchantProcessor 
-	
-	registeredUsers _ aUserRegistry .
-	catalogue _	aCatalogue.
-	salesBook _ aSalesBook .
-	merchantProcessor _ aMerchantProcessor .
+!SystemInterface methodsFor: 'initialization' stamp: 'FB 11/6/2017 17:53:53'!
+initializeWithUsers: aUserRegistry products: aCatalogue recordingOn: aSalesBook debitingThrough: aMerchantProcessor
+	registeredUsers _ aUserRegistry.
+	catalogue _ aCatalogue.
+	salesBook _ aSalesBook.
+	merchantProcessor _ aMerchantProcessor.
 	lastID _ 0.
-	carts _ Dictionary new.	
+	carts _ Dictionary new.
 	usersById _ Dictionary new.! !
 
 
@@ -1068,11 +1065,13 @@ invalidUserErrorMessage
 	
 	^ 'Invalid User'! !
 
-!SystemInterface class methodsFor: 'as yet unclassified' stamp: 'CM 11/6/2017 13:36:10'!
-withUsers: aUserRegistry products: aCatalogue recordingOn: aSalesBook debitingThrought: aMerchantProcessor 
-
-	^self basicNew initializeWithUsers: aUserRegistry products: aCatalogue recordingOn: aSalesBook debitingThrought: aMerchantProcessor 
-! !
+!SystemInterface class methodsFor: 'as yet unclassified' stamp: 'FB 11/6/2017 17:53:53'!
+withUsers: aUserRegistry products: aCatalogue recordingOn: aSalesBook debitingThrought: aMerchantProcessor
+	^ self basicNew
+		initializeWithUsers: aUserRegistry
+		products: aCatalogue
+		recordingOn: aSalesBook
+		debitingThrough: aMerchantProcessor.! !
 
 
 !classDefinition: #User category: #TusLibros!

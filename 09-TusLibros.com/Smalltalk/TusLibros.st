@@ -156,6 +156,11 @@ test09CanNotRemoveAnItemFromCartThatWasNotAdded
 createCart
 	^ Cart withCatalogue: self defaultCatalogue.! !
 
+!TusLibrosTest methodsFor: 'cart creation' stamp: 'CM 11/6/2017 16:43:41'!
+createSalePage
+
+	^ OrderedCollection new.! !
+
 !TusLibrosTest methodsFor: 'cart creation' stamp: 'FB 10/30/2017 21:02:50'!
 createSalesBook
 
@@ -267,12 +272,12 @@ createValidCreditCard
 	^CreditCard withOwner: 'Juan Perez' withNumber: '5400000000000001' withExpiration: Date tomorrow month.! !
 
 
-!TusLibrosTest methodsFor: 'cashier test' stamp: 'FB 10/30/2017 21:03:53'!
+!TusLibrosTest methodsFor: 'cashier test' stamp: 'CM 11/6/2017 16:43:55'!
 test13CanNotCheckoutEmptyCart
 	| cashier card salesBook |
 	cashier _ self createCashier.
 	card _ self createValidCreditCard.
-	salesBook _ self createSalesBook.
+	salesBook _ self createSalePage .
 	
 	self
 		should: [ cashier checkoutWithCreditCard: card registerOn: salesBook .]
@@ -280,14 +285,14 @@ test13CanNotCheckoutEmptyCart
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = Cashier emptyCartCheckoutErrorMessage ].! !
 
-!TusLibrosTest methodsFor: 'cashier test' stamp: 'FB 10/30/2017 21:04:25'!
+!TusLibrosTest methodsFor: 'cashier test' stamp: 'CM 11/6/2017 16:44:03'!
 test14CanNotCheckoutCartWithExpiredCreditCard
 	| cart cashier card salesBook |
 	cashier _ self createCashier.
 	cart _ cashier cart.
 	cart add: self item1SoldByStore.
 	card _ self createExpiredCreditCard.
-	salesBook _ self createSalesBook.
+	salesBook _ self createSalePage.
 	
 	self
 		should: [ cashier checkoutWithCreditCard: card registerOn: salesBook .]
@@ -295,7 +300,7 @@ test14CanNotCheckoutCartWithExpiredCreditCard
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = Cashier expiredCardCheckoutErrorMessage ].! !
 
-!TusLibrosTest methodsFor: 'cashier test' stamp: 'CM 11/2/2017 17:35:29'!
+!TusLibrosTest methodsFor: 'cashier test' stamp: 'CM 11/6/2017 16:44:10'!
 test15CashierCalculatesTheRightAmountToDebit
 	| cart cashier card salesBook |
 	cashier _ self createCashier.
@@ -305,11 +310,11 @@ test15CashierCalculatesTheRightAmountToDebit
 	cart add: self item2SoldByStore.
 	cart add: self item2SoldByStore.
 	card _ self createValidCreditCard.
-	salesBook _ self createSalesBook.
+	salesBook _ self createSalePage.
 		
 	self assert: (cashier checkoutWithCreditCard: card registerOn: salesBook) = (80 * peso).! !
 
-!TusLibrosTest methodsFor: 'cashier test' stamp: 'CM 11/2/2017 17:29:38'!
+!TusLibrosTest methodsFor: 'cashier test' stamp: 'CM 11/6/2017 16:44:17'!
 test16CanNotCheckoutWithStolenCreditCard
 
 	| cart cashier card salesBook |
@@ -318,7 +323,7 @@ test16CanNotCheckoutWithStolenCreditCard
 	cart add: self item1SoldByStore.
 	card _ self createStolenCreditCard.
 	cashier merchantProcessor simulateUsing: [self stolenCreditCardException ].
-	salesBook _ self createSalesBook.
+	salesBook _ self createSalePage.
 	
 	self
 		should: [ cashier checkoutWithCreditCard: card registerOn: salesBook .]
@@ -327,7 +332,7 @@ test16CanNotCheckoutWithStolenCreditCard
 			self assert: anError messageText = MerchantProcessorSimulator stolenCreditCardMessage ].
 	self assert: salesBook isEmpty.	! !
 
-!TusLibrosTest methodsFor: 'cashier test' stamp: 'CM 11/2/2017 17:30:47'!
+!TusLibrosTest methodsFor: 'cashier test' stamp: 'CM 11/6/2017 16:44:23'!
 test17CanNotCheckoutWithInsufficientFunds
 
 	| cart cashier card salesBook |
@@ -336,7 +341,7 @@ test17CanNotCheckoutWithInsufficientFunds
 	cart add: self item1SoldByStore.
 	card _ self createStolenCreditCard.
 	cashier merchantProcessor simulateUsing: [self insufficientFundsCreditCardException].
-	salesBook _ self createSalesBook.
+	salesBook _ self createSalePage.
 	
 	self
 		should: [ cashier checkoutWithCreditCard: card registerOn: salesBook .]
@@ -345,7 +350,7 @@ test17CanNotCheckoutWithInsufficientFunds
 			self assert: anError messageText = MerchantProcessorSimulator insufficentFundsMessage ].
 	self assert: salesBook isEmpty.	! !
 
-!TusLibrosTest methodsFor: 'cashier test' stamp: 'CM 11/2/2017 17:39:10'!
+!TusLibrosTest methodsFor: 'cashier test' stamp: 'CM 11/6/2017 16:44:30'!
 test18CanNotCheckoutWithInvalidCreditCard
 
 	| cart cashier card salesBook |
@@ -354,7 +359,7 @@ test18CanNotCheckoutWithInvalidCreditCard
 	cart add: self item1SoldByStore.
 	card _ self createValidCreditCard. "Valida como tarjeta, no existente en la BD del MP"
 	cashier merchantProcessor simulateUsing: [self invalidCreditCardException].
-	salesBook _ self createSalesBook.
+	salesBook _ self createSalePage.
 	
 	self
 		should: [ cashier checkoutWithCreditCard: card registerOn: salesBook .]
@@ -389,6 +394,16 @@ stolenCreditCardException
 	! !
 
 
+!TusLibrosTest methodsFor: 'User Creation' stamp: 'CM 11/6/2017 15:56:25'!
+createUserRegistry
+	| user userRegistry |
+
+	userRegistry _ OrderedCollection new.
+	user _ self createValidUser.
+	userRegistry add: user.
+
+	^userRegistry ! !
+
 !TusLibrosTest methodsFor: 'User Creation' stamp: 'FB 11/2/2017 19:59:57'!
 createUserWithInvalidID
 
@@ -405,38 +420,210 @@ createValidUser
 	^User id: 'user'  password: 'password' ! !
 
 
-!TusLibrosTest methodsFor: 'REST Inner Interface test' stamp: 'FB 11/2/2017 20:41:02'!
+!TusLibrosTest methodsFor: 'Interface test' stamp: 'CM 11/6/2017 15:21:58'!
 test19CanNotCreateCartForInvalidUser
-
-	| interface invalidIdUser invalidPasswordUser userRegistry |
-	userRegistry _ OrderedCollection new.
-	interface _ RESTInnerInterface with: userRegistry.
-	invalidIdUser _  self createUserWithInvalidID.
-	invalidPasswordUser _  self createUserWithInvalidPassword.
+	| interface invalidIdUser invalidPasswordUser |
+	interface _ self defaultInterface.
+	invalidIdUser _ self createUserWithInvalidID.
+	invalidPasswordUser _ self createUserWithInvalidPassword.
 	self
-		should: [ interface createCartForAUser: invalidIdUser .]
+		should: [ interface createCartForAUser: invalidIdUser ]
 		raise: Error
 		withExceptionDo: [ :anError |
-			self assert: anError messageText = RESTInnerInterface invalidUserErrorMessage ].	
-
+			self assert: anError messageText = SystemInterface invalidUserErrorMessage ].
 	self
 		should: [ interface createCartForAUser: invalidPasswordUser ]
 		raise: Error
 		withExceptionDo: [ :anError |
-			self assert: anError messageText = RESTInnerInterface invalidUserErrorMessage ].			! !
+			self assert: anError messageText = SystemInterface invalidUserErrorMessage ].! !
 
-!TusLibrosTest methodsFor: 'REST Inner Interface test' stamp: 'FB 11/2/2017 20:46:25'!
+!TusLibrosTest methodsFor: 'Interface test' stamp: 'CM 11/6/2017 14:20:50'!
 test20CanCreateCartForValidUser
-
-	| interface idCart user userRegistry |
-	userRegistry _ OrderedCollection new.
-	user _ self createValidUser.
-	userRegistry add: user.
-	interface _ RESTInnerInterface with: userRegistry.
+	| interface user|
+	interface _ self defaultInterface. 
+	user _ self createValidUser .
 	
+	self shouldnt: [interface createCartForAUser: user] raise: Error ! !
+
+!TusLibrosTest methodsFor: 'Interface test' stamp: 'CM 11/6/2017 14:00:52'!
+test21CanAddItemsToCart
+	| interface idCart user item|
+	interface _ self defaultInterface. 
+	user _ self createValidUser .
+	item _ self item1SoldByStore. 
+	idCart _ interface createCartForAUser: user.
+	interface add: 1 of: item to: idCart .
+	
+	self assert: ( (interface listCart: idCart) includes: item ).! !
+
+!TusLibrosTest methodsFor: 'Interface test' stamp: 'CM 11/6/2017 15:21:58'!
+test22CannotAddItemsToInvalidCart
+	| interface idCart item |
+	interface _ self defaultInterface.
+	item _ self item1SoldByStore.
+	idCart _ 1.
+	self
+		should: [
+			interface
+				add: 1
+				of: item
+				to: idCart ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SystemInterface invalidCartErrorMessage ].! !
+
+!TusLibrosTest methodsFor: 'Interface test' stamp: 'CM 11/6/2017 14:14:04'!
+test23CannotAddNotExistingItems
+	|user itemNotSold interface idCart |
+	interface _ self defaultInterface. 
+	
+	itemNotSold _ self itemNotSoldByStore .
+	
+	user _ self createValidUser .
 	idCart _ interface createCartForAUser: user.
 	
-	self assert: (interface listCart: idCart) isEmpty. ! !
+	self
+		should: [ interface add: 1 of: itemNotSold to: idCart ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Cart invalidItemErrorMessage.
+			self assert: (interface listCart: idCart) isEmpty.].! !
+
+!TusLibrosTest methodsFor: 'Interface test' stamp: 'CM 11/6/2017 14:16:29'!
+test24ListCartOfANewCartIsEmpty
+	| interface idCart user|
+	interface _ self defaultInterface. 
+	user _ self createValidUser .
+	idCart _ interface createCartForAUser: user.
+	
+	self assert: (interface listCart: idCart) isEmpty.! !
+
+!TusLibrosTest methodsFor: 'Interface test' stamp: 'CM 11/6/2017 14:40:53'!
+test25ListCartHasTheCorrectNumberOfOccurrences
+	|item1 item2 cartBag interface idCart user|
+	interface _ self defaultInterface. 
+	user _ self createValidUser .
+	idCart _ interface createCartForAUser: user.
+	
+	item1 _ self item1SoldByStore. 
+	item2 _ self item2SoldByStore.
+	interface add: 2 of: item1 to: idCart .
+	interface add: 3 of: item2 to: idCart .
+	
+	cartBag _ interface listCart: idCart.
+	
+	self assert: ((cartBag occurrencesOf: item1) = 2).
+	self assert: ((cartBag occurrencesOf: item2) = 3).! !
+
+!TusLibrosTest methodsFor: 'Interface test' stamp: 'CM 11/6/2017 15:14:12'!
+test26CannotCheckOutAnEmptyCart
+	| interface idCart user card |
+	interface _ self defaultInterface. 
+	user _ self createValidUser .
+	idCart _ interface createCartForAUser: user.
+	card _ self createValidCreditCard .
+	
+	self
+		should: [ interface checkOutCart: idCart withCreditCard: card ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText =  Cashier emptyCartCheckoutErrorMessage ].! !
+
+!TusLibrosTest methodsFor: 'Interface test' stamp: 'CM 11/6/2017 15:21:58'!
+test27CannotCheckOutAnNotExistingCart
+	| interface wrongId idCart user card |
+	interface _ self defaultInterface.
+	user _ self createValidUser.
+	idCart _ interface createCartForAUser: user.
+	card _ self createValidCreditCard.
+	wrongId _ 10.
+	self
+		should: [
+			interface
+				checkOutCart: wrongId
+				withCreditCard: card ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SystemInterface invalidCartErrorMessage ].! !
+
+!TusLibrosTest methodsFor: 'Interface test' stamp: 'CM 11/6/2017 15:19:37'!
+test28CannotCheckOutWithAInvalidCard
+	| interface idCart user card item |
+	interface _ self defaultInterface. 
+	user _ self createValidUser .
+	idCart _ interface createCartForAUser: user.
+	item _ self item1SoldByStore .
+	interface add: 1 of: item to: idCart. 
+	card _ self createExpiredCreditCard .
+	
+	self
+		should: [ interface checkOutCart: idCart withCreditCard: card ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText =  Cashier expiredCardCheckoutErrorMessage ].! !
+
+!TusLibrosTest methodsFor: 'Interface test' stamp: 'CM 11/6/2017 15:21:33'!
+test29CanCheckOut
+	| interface idCart user card item |
+	interface _ self defaultInterface. 
+	user _ self createValidUser .
+	idCart _ interface createCartForAUser: user.
+	item _ self item1SoldByStore .
+	interface add: 1 of: item to: idCart. 
+	card _ self createValidCreditCard .
+	
+	self shouldnt: [ interface checkOutCart: idCart withCreditCard: card ] raise: Error ! !
+
+!TusLibrosTest methodsFor: 'Interface test' stamp: 'CM 11/6/2017 16:16:46'!
+test30CannotListPurchasesOfAnInvalidUser
+	| interface userWrongPassword userWrongId |
+	interface _ self defaultInterface. 
+	userWrongPassword _ self createUserWithInvalidPassword.
+	userWrongId _ self createUserWithInvalidID.
+	self
+		should: [ interface listPurchases: userWrongPassword ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText =  SystemInterface invalidUserErrorMessage ].
+		
+	self
+		should: [ interface listPurchases: userWrongId ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText =  SystemInterface invalidUserErrorMessage ].	! !
+
+!TusLibrosTest methodsFor: 'Interface test' stamp: 'CM 11/6/2017 17:23:13'!
+test31ListPurchasesReturnsTheCorrectData
+	| interface idCart user item1 item2 card list sale1 sale2 |
+	card _ self createValidCreditCard .
+	interface _ self defaultInterface. 
+	user _ self createValidUser .
+	
+	item1 _ self item1SoldByStore. 
+	item2 _ self item2SoldByStore. 
+	
+	sale1 _ Sale of: item1 times: 2  each: (10*peso).
+	sale2 _ Sale of: item2 times: 2  each: (30*peso).
+	
+	idCart _ interface createCartForAUser: user.
+	interface add: 2 of: item1 to: idCart .
+	interface add: 2 of: item2 to: idCart .
+	interface checkOutCart: idCart withCreditCard: card.
+	
+	list _ interface listPurchases: user.
+	
+	self assert: ( list includesKey: (80*peso) ).
+	self assert: ( (list at: (80*peso)) includes: sale1 ).
+	self assert: ( (list at: (80*peso)) includes: sale2 ).! !
+
+
+!TusLibrosTest methodsFor: 'interface creation' stamp: 'CM 11/6/2017 15:21:58'!
+defaultInterface
+	^ SystemInterface
+		withUsers: self createUserRegistry
+		products: self defaultCatalogue
+		recordingOn: self createSalesBook
+		debitingThrought: self createMPSimulator.! !
 
 
 !classDefinition: #Cart category: #TusLibros!
@@ -445,6 +632,13 @@ Object subclass: #Cart
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
+
+!Cart methodsFor: 'initialization' stamp: 'FB 10/27/2017 10:35:46'!
+initializeWithCatalogue: aCatalogue
+
+	items _ Bag new.
+	catalogue _ aCatalogue.! !
+
 
 !Cart methodsFor: 'adding items' stamp: 'FB 10/30/2017 18:21:19'!
 add: anItem
@@ -459,13 +653,6 @@ add: quantity of: anItem
 	(catalogue includesKey: anItem) ifFalse: [ ^self invalidItemErrorMessage ].
 	items add: anItem withOccurrences: quantity.
 	! !
-
-
-!Cart methodsFor: 'initialization' stamp: 'FB 10/27/2017 10:35:46'!
-initializeWithCatalogue: aCatalogue
-
-	items _ Bag new.
-	catalogue _ aCatalogue.! !
 
 
 !Cart methodsFor: 'inspection' stamp: 'FB 10/28/2017 11:57:22'!
@@ -555,17 +742,14 @@ checkoutWithCreditCard: aCreditCard registerOn: aSalesBook
 	^totalAmount.
 	! !
 
-!Cashier methodsFor: 'checkout' stamp: 'CM 11/2/2017 16:53:12'!
+!Cashier methodsFor: 'checkout' stamp: 'CM 11/6/2017 17:23:39'!
 recordSaleOn: aSalesBook
+	|sale|
+	
+	(cart items asSet) do: [:anItem |
+		sale _ Sale of: anItem times: (cart occurrencesOf: anItem) each: (catalogue at: anItem).   
+		 aSalesBook add: sale. ]! !
 
-	cart items do: [:anItem | aSalesBook at: anItem put: (catalogue at: anItem) ]! !
-
-
-!Cashier methodsFor: 'initialization' stamp: 'FB 10/28/2017 11:57:11'!
-initializeFor: aShoppingCart
-
-	cart _ aShoppingCart.
-	catalogue _ cart catalogue.! !
 
 !Cashier methodsFor: 'initialization' stamp: 'CM 11/2/2017 16:22:35'!
 initializeWith: aShoppingCart with: aMerchantProcessor
@@ -596,6 +780,13 @@ merchantProcessor
 Cashier class
 	instanceVariableNames: ''!
 
+
+!Cashier class methodsFor: 'instance creation' stamp: 'CM 11/2/2017 16:21:43'!
+with: aShoppingCart with: aMerchantProcessor
+
+	^self basicNew initializeWith: aShoppingCart with: aMerchantProcessor .! !
+
+
 !Cashier class methodsFor: 'error messages' stamp: 'FB 10/27/2017 11:27:39'!
 emptyCartCheckoutErrorMessage
 
@@ -606,16 +797,6 @@ expiredCardCheckoutErrorMessage
 	
 	^'Error: can not checkout with expired credit card'.! !
 
-
-!Cashier class methodsFor: 'instance creation' stamp: 'FB 10/28/2017 11:55:59'!
-for: aShoppingCart
-
-	^self basicNew initializeFor: aShoppingCart.! !
-
-!Cashier class methodsFor: 'instance creation' stamp: 'CM 11/2/2017 16:21:43'!
-with: aShoppingCart with: aMerchantProcessor
-
-	^self basicNew initializeWith: aShoppingCart with: aMerchantProcessor .! !
 
 
 !classDefinition: #CreditCard category: #TusLibros!
@@ -719,84 +900,209 @@ with: aClosure
 	^ self new initializeWith: aClosure .! !
 
 
-!classDefinition: #RESTInnerInterface category: #TusLibros!
-Object subclass: #RESTInnerInterface
-	instanceVariableNames: 'registeredUsers'
+!classDefinition: #Sale category: #TusLibros!
+Object subclass: #Sale
+	instanceVariableNames: 'item count value'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!RESTInnerInterface methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 20:14:10'!
-assertIsARegisteredUser: aUser.
+!Sale methodsFor: 'initialization' stamp: 'CM 11/6/2017 17:23:26'!
+initializeOf: anItem times: aQuantity each: anAmount
 
-	(registeredUsers includes: aUser) ifFalse: [^self invalidUserError]  
-	
-	
-	
-	! !
+	item  _ anItem .
+	count _ aQuantity .
+	value _ anAmount * aQuantity .! !
 
-!RESTInnerInterface methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 20:10:47'!
-createCartForAUser: aUser
 
-	self assertIsARegisteredUser: aUser.
-	
-	
-	
-	! !
+!Sale methodsFor: 'inspect' stamp: 'CM 11/6/2017 17:25:50'!
+= otherSale
 
-!RESTInnerInterface methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 20:38:55'!
-initializeWith: aUserRegistry
+	^ ( (item = otherSale item) and: (count = otherSale count) ) and: ( value = otherSale value )! !
 
-	registeredUsers _ aUserRegistry .! !
+!Sale methodsFor: 'inspect' stamp: 'CM 11/6/2017 17:26:06'!
+count
 
-!RESTInnerInterface methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 20:15:27'!
-invalidUserError
+	^count ! !
 
-	^ Error signal: RESTInnerInterface invalidUserErrorMessage
-	
-	
-	
-	! !
+!Sale methodsFor: 'inspect' stamp: 'CM 11/6/2017 17:26:15'!
+item
+
+	^item ! !
+
+!Sale methodsFor: 'inspect' stamp: 'CM 11/6/2017 17:10:03'!
+value
+
+	^value ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'RESTInnerInterface class' category: #TusLibros!
-RESTInnerInterface class
+!classDefinition: 'Sale class' category: #TusLibros!
+Sale class
 	instanceVariableNames: ''!
 
-!RESTInnerInterface class methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 20:16:10'!
+!Sale class methodsFor: 'instance creation' stamp: 'CM 11/6/2017 16:46:03'!
+of: anItem times: aQuantity each: anAmount
+
+	^self basicNew initializeOf: anItem times: aQuantity each: anAmount ! !
+
+
+!classDefinition: #SystemInterface category: #TusLibros!
+Object subclass: #SystemInterface
+	instanceVariableNames: 'registeredUsers catalogue merchantProcessor carts lastID salesBook usersById'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!SystemInterface methodsFor: 'public actions' stamp: 'CM 11/6/2017 13:56:18'!
+add: aQuantity of: anItem to: aCartID
+	|cart|
+	cart _ self cartWithID: aCartID. 	
+	cart add: aQuantity of: anItem 
+	
+	! !
+
+!SystemInterface methodsFor: 'public actions' stamp: 'CM 11/6/2017 16:55:43'!
+checkOutCart: aCartId withCreditCard: aCreditCard
+	|cashier user salePage cart|
+	cart _ self cartWithID: aCartId.
+	cashier _ Cashier with: cart with: merchantProcessor.
+	user _ usersById at: aCartId.
+	salePage _ self salesOfUser: user.
+	cashier checkoutWithCreditCard: aCreditCard  registerOn: salePage.! !
+
+!SystemInterface methodsFor: 'public actions' stamp: 'CM 11/6/2017 16:09:11'!
+createCartForAUser: aUser
+	|cart idCart|
+	self assertIsARegisteredUser: aUser.
+	
+	cart _ Cart withCatalogue: catalogue.
+	idCart _ lastID. 
+	carts at: lastID put: cart.
+	usersById at: lastID put: aUser.
+	salesBook at: aUser ifAbsent: [ salesBook at: aUser put: (OrderedCollection new) ].
+	lastID _ idCart + 1.
+	
+	^idCart 
+	
+		
+	
+	! !
+
+!SystemInterface methodsFor: 'public actions' stamp: 'CM 11/6/2017 13:56:54'!
+listCart: aCart
+
+	^( (self cartWithID: aCart ) items ) copy. ! !
+
+!SystemInterface methodsFor: 'public actions' stamp: 'CM 11/6/2017 17:12:36'!
+listPurchases: aUser 
+	|total list userSales|
+	self assertIsARegisteredUser: aUser .
+	total  _ (self salesOfUser: aUser) inject: 0 * peso into: 
+		[ :subTotal :anItem | subTotal + (anItem value)].
+	
+	list _ Dictionary new.
+	userSales _ (self salesOfUser: aUser) copy.
+	list at: total put: userSales.
+	
+	^list 
+		
+		
+	
+	! !
+
+
+!SystemInterface methodsFor: 'private' stamp: 'CM 11/6/2017 15:56:47'!
+assertIsARegisteredUser: aUser.
+
+	(registeredUsers includes: aUser) ifFalse: [self invalidUserError]  
+	
+	
+	
+	! !
+
+!SystemInterface methodsFor: 'private' stamp: 'CM 11/6/2017 14:04:04'!
+cartWithID: aCartID
+
+	^carts at: aCartID ifAbsent: [self invalidCartIdError]! !
+
+!SystemInterface methodsFor: 'private' stamp: 'CM 11/6/2017 16:04:10'!
+salesOfUser: anUser
+
+	^salesBook at: anUser ! !
+
+
+!SystemInterface methodsFor: 'initialization' stamp: 'CM 11/6/2017 15:58:39'!
+initializeWithUsers: aUserRegistry products: aCatalogue recordingOn: aSalesBook debitingThrought: aMerchantProcessor 
+	
+	registeredUsers _ aUserRegistry .
+	catalogue _	aCatalogue.
+	salesBook _ aSalesBook .
+	merchantProcessor _ aMerchantProcessor .
+	lastID _ 0.
+	carts _ Dictionary new.	
+	usersById _ Dictionary new.! !
+
+
+!SystemInterface methodsFor: 'errors' stamp: 'CM 11/6/2017 15:21:58'!
+invalidCartIdError
+	^ Error signal: SystemInterface invalidCartErrorMessage.! !
+
+!SystemInterface methodsFor: 'errors' stamp: 'CM 11/6/2017 15:21:58'!
+invalidUserError
+	^ Error signal: SystemInterface invalidUserErrorMessage.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'SystemInterface class' category: #TusLibros!
+SystemInterface class
+	instanceVariableNames: 'aValidUsers'!
+
+!SystemInterface class methodsFor: 'as yet unclassified' stamp: 'CM 11/6/2017 14:03:46'!
+invalidCartErrorMessage
+	
+	^ 'Invalid Cart'! !
+
+!SystemInterface class methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 20:16:10'!
 invalidUserErrorMessage
 	
 	^ 'Invalid User'! !
 
-!RESTInnerInterface class methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 20:40:05'!
-with: aUserRegistry
+!SystemInterface class methodsFor: 'as yet unclassified' stamp: 'CM 11/6/2017 13:36:10'!
+withUsers: aUserRegistry products: aCatalogue recordingOn: aSalesBook debitingThrought: aMerchantProcessor 
 
-	^self basicNew initializeWith: aUserRegistry ! !
+	^self basicNew initializeWithUsers: aUserRegistry products: aCatalogue recordingOn: aSalesBook debitingThrought: aMerchantProcessor 
+! !
 
 
 !classDefinition: #User category: #TusLibros!
 Object subclass: #User
-	instanceVariableNames: 'id password'
+	instanceVariableNames: 'id pword'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!User methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 19:54:00'!
+!User methodsFor: 'inspect' stamp: 'CM 11/6/2017 15:46:58'!
+= otherUser
+
+	^ (id = otherUser id) and: (pword = otherUser password)! !
+
+!User methodsFor: 'inspect' stamp: 'FB 11/2/2017 19:54:00'!
 id
 
 	^id ! !
 
-!User methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 19:57:28'!
+!User methodsFor: 'inspect' stamp: 'CM 11/6/2017 13:50:16'!
+password
+
+	^pword ! !
+
+
+!User methodsFor: 'initialization' stamp: 'FB 11/2/2017 19:57:28'!
 intializeWithID: anId andPassword: aPassword 
 
 	id _ anId.
 	password _ aPassword.! !
-
-!User methodsFor: 'as yet unclassified' stamp: 'FB 11/2/2017 19:54:10'!
-password
-
-	^password ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 

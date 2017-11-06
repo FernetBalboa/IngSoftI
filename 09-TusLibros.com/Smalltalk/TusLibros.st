@@ -617,13 +617,14 @@ test31ListPurchasesReturnsTheCorrectData
 	self assert: ( (list at: (80*peso)) includes: sale2 ).! !
 
 
-!TusLibrosTest methodsFor: 'interface creation' stamp: 'CM 11/6/2017 15:21:58'!
+!TusLibrosTest methodsFor: 'interface creation' stamp: 'FB 11/6/2017 18:27:45'!
 defaultInterface
 	^ SystemInterface
 		withUsers: self createUserRegistry
 		products: self defaultCatalogue
 		recordingOn: self createSalesBook
-		debitingThrought: self createMPSimulator.! !
+		debitingThrought: self createMPSimulator.
+		"Agregar manual clock"! !
 
 
 !classDefinition: #Cart category: #TusLibros!
@@ -847,6 +848,51 @@ invalidNumberErrorMessage
 	^'Error: credit card number must have 16 digits'.! !
 
 
+!classDefinition: #ManualClock category: #TusLibros!
+Object subclass: #ManualClock
+	instanceVariableNames: 'currentTime'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!ManualClock methodsFor: 'initialization' stamp: 'FB 11/6/2017 18:02:37'!
+initializeWithTime: aTime
+
+	currentTime _ aTime.! !
+
+
+!ManualClock methodsFor: 'time manipulation' stamp: 'FB 11/6/2017 18:03:22'!
+advanceTime: aDuration
+
+	currentTime _ currentTime + aDuration.! !
+
+!ManualClock methodsFor: 'time manipulation' stamp: 'FB 11/6/2017 18:04:13'!
+now
+
+	^currentTime now.! !
+
+!ManualClock methodsFor: 'time manipulation' stamp: 'FB 11/6/2017 18:22:33'!
+now: aTime
+
+	currentTime _ aTime.! !
+
+!ManualClock methodsFor: 'time manipulation' stamp: 'FB 11/6/2017 18:03:58'!
+reverseTime: aDuration
+
+	currentTime _ currentTime - aDuration.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ManualClock class' category: #TusLibros!
+ManualClock class
+	instanceVariableNames: ''!
+
+!ManualClock class methodsFor: 'instance creation' stamp: 'FB 11/6/2017 18:02:12'!
+withTime: aTime
+
+	^self basicNew initializeWithTime: aTime.! !
+
+
 !classDefinition: #MerchantProcessorSimulator category: #TusLibros!
 Object subclass: #MerchantProcessorSimulator
 	instanceVariableNames: 'value'
@@ -947,7 +993,7 @@ of: anItem times: aQuantity each: anAmount
 
 !classDefinition: #SystemInterface category: #TusLibros!
 Object subclass: #SystemInterface
-	instanceVariableNames: 'registeredUsers catalogue merchantProcessor carts lastID salesBook usersById'
+	instanceVariableNames: 'registeredUsers catalogue merchantProcessor carts lastID salesBook usersById clock'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -1030,12 +1076,25 @@ salesOfUser: anUser
 	^salesBook at: anUser ! !
 
 
-!SystemInterface methodsFor: 'initialization' stamp: 'FB 11/6/2017 17:53:53'!
+!SystemInterface methodsFor: 'initialization' stamp: 'FB 11/6/2017 18:25:10'!
 initializeWithUsers: aUserRegistry products: aCatalogue recordingOn: aSalesBook debitingThrough: aMerchantProcessor
+	"Borrar ?"
+	
 	registeredUsers _ aUserRegistry.
 	catalogue _ aCatalogue.
 	salesBook _ aSalesBook.
 	merchantProcessor _ aMerchantProcessor.
+	lastID _ 0.
+	carts _ Dictionary new.
+	usersById _ Dictionary new.! !
+
+!SystemInterface methodsFor: 'initialization' stamp: 'FB 11/6/2017 18:23:46'!
+initializeWithUsers: aUserRegistry products: aCatalogue recordingOn: aSalesBook debitingThrough: aMerchantProcessor withClock: aClock
+	registeredUsers _ aUserRegistry.
+	catalogue _ aCatalogue.
+	salesBook _ aSalesBook.
+	merchantProcessor _ aMerchantProcessor.
+	clock _ aClock.
 	lastID _ 0.
 	carts _ Dictionary new.
 	usersById _ Dictionary new.! !
@@ -1065,13 +1124,24 @@ invalidUserErrorMessage
 	
 	^ 'Invalid User'! !
 
-!SystemInterface class methodsFor: 'as yet unclassified' stamp: 'FB 11/6/2017 17:53:53'!
+!SystemInterface class methodsFor: 'as yet unclassified' stamp: 'FB 11/6/2017 18:24:54'!
 withUsers: aUserRegistry products: aCatalogue recordingOn: aSalesBook debitingThrought: aMerchantProcessor
+	"Borrar ? "
+	
 	^ self basicNew
 		initializeWithUsers: aUserRegistry
 		products: aCatalogue
 		recordingOn: aSalesBook
 		debitingThrough: aMerchantProcessor.! !
+
+!SystemInterface class methodsFor: 'as yet unclassified' stamp: 'FB 11/6/2017 18:24:40'!
+withUsers: aUserRegistry products: aCatalogue recordingOn: aSalesBook debitingThrought: aMerchantProcessor withClock: aClock
+	^ self basicNew
+		initializeWithUsers: aUserRegistry
+		products: aCatalogue
+		recordingOn: aSalesBook
+		debitingThrough: aMerchantProcessor
+		withClock: aClock.! !
 
 
 !classDefinition: #User category: #TusLibros!
